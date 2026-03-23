@@ -26,3 +26,10 @@ export interface GenerationBatch {
   generatedAt: string;
   sequenceNumberStart: number;
 }
+
+export interface IndividualExam {
+  examId: string;
+  sequenceNumber: number;
+  questionOrder: string[];
+  alternativeOrders: Record<string, number[]>;
+}
