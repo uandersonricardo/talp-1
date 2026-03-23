@@ -8,16 +8,16 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "Questions", path: "/questions", icon: "quiz" },
-  { label: "Exams", path: "/exams", icon: "article" },
-  { label: "Grading", path: "/grade", icon: "grading" },
+  { label: "Questões", path: "/questions", icon: "quiz" },
+  { label: "Provas", path: "/exams", icon: "article" },
+  { label: "Correção", path: "/grade", icon: "grading" },
 ];
 
 function pageTitleFromPath(pathname: string): string {
-  if (pathname.startsWith("/questions")) return "Questions";
-  if (pathname.startsWith("/exams")) return "Exams";
-  if (pathname.startsWith("/grade")) return "Grading";
-  return "Exam Manager";
+  if (pathname.startsWith("/questions")) return "Questões";
+  if (pathname.startsWith("/exams")) return "Provas";
+  if (pathname.startsWith("/grade")) return "Correção";
+  return "Gestão de Provas";
 }
 
 function NavItems({ onNavigate }: { onNavigate?: () => void }) {
@@ -61,7 +61,7 @@ function Sidebar() {
         <span className="material-symbols-rounded text-[var(--color-primary)]" style={{ fontSize: 22 }}>
           school
         </span>
-        <span className="text-base font-medium text-[var(--color-on-surface)]">Exam Manager</span>
+        <span className="text-base font-medium text-[var(--color-on-surface)]">Gestão de Provas</span>
       </div>
       <div className="flex-1 overflow-y-auto py-2">
         <NavItems />
@@ -78,7 +78,7 @@ function MobileTopBar({ onMenuOpen }: { onMenuOpen: () => void }) {
     <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[var(--color-surface)] border-b border-[var(--color-outline)] z-30 flex items-center px-4 gap-3">
       <button
         onClick={onMenuOpen}
-        aria-label="Open navigation menu"
+        aria-label="Abrir menu de navegação"
         className="flex items-center justify-center w-10 h-10 -ml-2 rounded-lg hover:bg-[var(--color-surface-container)] transition-colors"
       >
         <span className="material-symbols-rounded" style={{ fontSize: 22 }}>
@@ -107,10 +107,10 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
               }
             `}</style>
             <div className="flex items-center justify-between px-6 h-14 shrink-0 border-b border-[var(--color-outline)]">
-              <span className="text-base font-medium text-[var(--color-on-surface)]">Exam Manager</span>
+              <span className="text-base font-medium text-[var(--color-on-surface)]">Gestão de Provas</span>
               <button
                 onClick={onClose}
-                aria-label="Close navigation menu"
+                aria-label="Fechar menu de navegação"
                 className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-[var(--color-surface-container)] transition-colors"
               >
                 <span className="material-symbols-rounded" style={{ fontSize: 20 }}>

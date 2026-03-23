@@ -32,10 +32,10 @@ export default function ExamFormPage() {
     try {
       if (id) {
         await updateExam(id, data);
-        addToast("Exam updated.", "success");
+        addToast("Prova atualizada.", "success");
       } else {
         await createExam(data);
-        addToast("Exam created.", "success");
+        addToast("Prova criada.", "success");
       }
       navigate("/exams");
     } catch (e) {
@@ -49,7 +49,7 @@ export default function ExamFormPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-[22px] font-medium leading-7 text-[var(--color-on-surface)]">
-          {isEdit ? "Edit Exam" : "New Exam"}
+          {isEdit ? "Editar Prova" : "Nova Prova"}
         </h1>
       </div>
 

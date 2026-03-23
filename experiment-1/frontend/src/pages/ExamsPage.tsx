@@ -13,9 +13,9 @@ export default function ExamsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
-        <h1 className="text-[22px] font-medium leading-7 text-[var(--color-on-surface)]">Exams</h1>
+        <h1 className="text-[22px] font-medium leading-7 text-[var(--color-on-surface)]">Provas</h1>
         <Button icon="add" onClick={() => navigate("/exams/new")} size="compact">
-          New Exam
+          Nova Prova
         </Button>
       </div>
 

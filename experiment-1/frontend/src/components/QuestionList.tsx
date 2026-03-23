@@ -53,7 +53,7 @@ export default function QuestionList({
     setDeleting(true);
     try {
       await deleteQuestion(deleteTarget.id);
-      addToast("Question deleted.", "success");
+      addToast("Questão excluída.", "success");
       onDeleted();
     } catch (e) {
       addToast((e as Error).message, "error");
@@ -64,7 +64,9 @@ export default function QuestionList({
   };
 
   if (!loading && questions.length === 0) {
-    return <EmptyState icon="quiz" title="No questions yet" description="Create your first question to get started." />;
+    return (
+      <EmptyState icon="quiz" title="Nenhuma questão ainda" description="Crie sua primeira questão para começar." />
+    );
   }
 
   return (
@@ -75,10 +77,10 @@ export default function QuestionList({
           <thead>
             <tr className="bg-[var(--color-surface-dim)]">
               <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide">
-                Statement
+                Enunciado
               </th>
               <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide w-32">
-                Alternatives
+                Alternativas
               </th>
               <th className="w-24" />
             </tr>
@@ -100,7 +102,7 @@ export default function QuestionList({
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                       <button
                         onClick={() => navigate(`/questions/${q.id}/edit`)}
-                        aria-label="Edit question"
+                        aria-label="Editar questão"
                         className="flex items-center justify-center w-8 h-8 rounded-lg text-[var(--color-on-surface-muted)] hover:bg-[var(--color-surface-container)] hover:text-[var(--color-on-surface)] transition-colors"
                       >
                         <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
@@ -109,7 +111,7 @@ export default function QuestionList({
                       </button>
                       <button
                         onClick={() => setDeleteTarget(q)}
-                        aria-label="Delete question"
+                        aria-label="Excluir questão"
                         className="flex items-center justify-center w-8 h-8 rounded-lg text-[var(--color-on-surface-muted)] hover:bg-[var(--color-error-surface)] hover:text-[var(--color-error)] transition-colors"
                       >
                         <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
@@ -134,7 +136,7 @@ export default function QuestionList({
                 <p className="text-sm font-medium text-[var(--color-on-surface)] line-clamp-2 mb-2">{q.statement}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-[var(--color-on-surface-muted)]">
-                    {q.alternatives.length} alternatives
+                    {q.alternatives.length} alternativas
                   </span>
                   <div className="flex gap-1">
                     <button
@@ -168,8 +170,8 @@ export default function QuestionList({
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
         loading={deleting}
-        title="Delete question?"
-        description={`"${deleteTarget?.statement.slice(0, 80)}" will be permanently deleted. This cannot be undone.`}
+        title="Excluir questão?"
+        description={`"${deleteTarget?.statement.slice(0, 80)}" será excluída permanentemente. Essa ação não pode ser desfeita.`}
       />
     </>
   );

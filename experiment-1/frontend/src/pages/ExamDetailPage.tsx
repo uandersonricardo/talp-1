@@ -39,7 +39,7 @@ export default function ExamDetailPage() {
   if (error || !exam) {
     return (
       <div className="bg-[var(--color-error-surface)] border border-[var(--color-error)]/30 rounded-xl p-6 text-sm text-[var(--color-error)]">
-        {error ?? "Exam not found."}
+        {error ?? "Prova não encontrada."}
       </div>
     );
   }
@@ -56,12 +56,12 @@ export default function ExamDetailPage() {
             <span className="material-symbols-rounded" style={{ fontSize: 16 }}>
               arrow_back
             </span>
-            Exams
+            Provas
           </button>
           <h1 className="text-[22px] font-medium leading-7 text-[var(--color-on-surface)] truncate">{exam.title}</h1>
         </div>
         <Button icon="edit" variant="outlined" size="compact" onClick={() => navigate(`/exams/${exam.id}/edit`)}>
-          Edit
+          Editar
         </Button>
       </div>
 
@@ -73,7 +73,7 @@ export default function ExamDetailPage() {
       {/* Generation card */}
       <Card>
         <div className="flex flex-col gap-4">
-          <h2 className="text-base font-medium text-[var(--color-on-surface)]">Generate exams</h2>
+          <h2 className="text-base font-medium text-[var(--color-on-surface)]">Gerar provas</h2>
           <GenerationPanel examId={exam.id} addToast={addToast} />
         </div>
       </Card>

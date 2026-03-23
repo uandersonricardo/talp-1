@@ -37,12 +37,12 @@ export default function QuestionForm({ initial, onSave, onCancel, saving = false
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
-    if (!statement.trim()) errs.statement = "Statement is required.";
-    if (alternatives.length < 2) errs.alternatives = "At least 2 alternatives are required.";
+    if (!statement.trim()) errs.statement = "Enunciado é obrigatório.";
+    if (alternatives.length < 2) errs.alternatives = "São necessárias pelo menos 2 alternativas.";
     alternatives.forEach((a, i) => {
-      if (!a.description.trim()) errs[`alt-${i}`] = "Description is required.";
+      if (!a.description.trim()) errs[`alt-${i}`] = "Descrição é obrigatória.";
     });
-    if (!alternatives.some((a) => a.correct)) errs.correct = "At least one alternative must be correct.";
+    if (!alternatives.some((a) => a.correct)) errs.correct = "Pelo menos uma alternativa deve ser correta.";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -74,16 +74,16 @@ export default function QuestionForm({ initial, onSave, onCancel, saving = false
             <span className="material-symbols-rounded shrink-0" style={{ fontSize: 18 }}>
               error
             </span>
-            <span>Please fix the errors below before saving.</span>
+            <span>Corrija os erros abaixo antes de salvar.</span>
           </div>
         )}
 
         <Textarea
-          label="Statement"
+          label="Enunciado"
           value={statement}
           onChange={(e) => setStatement(e.target.value)}
           onBlur={() => {
-            if (!statement.trim()) setErrors((p) => ({ ...p, statement: "Statement is required." }));
+            if (!statement.trim()) setErrors((p) => ({ ...p, statement: "Enunciado é obrigatório." }));
             else
               setErrors((p) => {
                 const n = { ...p };
@@ -91,16 +91,18 @@ export default function QuestionForm({ initial, onSave, onCancel, saving = false
                 return n;
               });
           }}
-          placeholder="Enter the question text…"
+          placeholder="Digite o texto da questão…"
           error={errors.statement}
         />
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide">
-              Alternatives
+              Alternativas
             </span>
-            <span className="text-xs text-[var(--color-on-surface-muted)]">Toggle the dot to mark as correct</span>
+            <span className="text-xs text-[var(--color-on-surface-muted)]">
+              Clique no círculo para marcar como correta
+            </span>
           </div>
 
           {(errors.alternatives || errors.correct) && (
@@ -120,7 +122,7 @@ export default function QuestionForm({ initial, onSave, onCancel, saving = false
                 <button
                   type="button"
                   onClick={() => updateAlt(alt.key, { correct: !alt.correct })}
-                  aria-label={alt.correct ? "Mark as incorrect" : "Mark as correct"}
+                  aria-label={alt.correct ? "Marcar como incorreta" : "Marcar como correta"}
                   className="flex shrink-0 focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]"
                 >
                   <span
@@ -139,7 +141,7 @@ export default function QuestionForm({ initial, onSave, onCancel, saving = false
                     type="text"
                     value={alt.description}
                     onChange={(e) => updateAlt(alt.key, { description: e.target.value })}
-                    placeholder={`Alternative ${idx + 1}`}
+                    placeholder={`Alternativa ${idx + 1}`}
                     className={`w-full h-9 px-3 rounded-lg border text-sm bg-transparent text-[var(--color-on-surface)] placeholder:text-[var(--color-on-surface-muted)] focus:outline-none transition-colors
                       ${errors[`alt-${idx}`] ? "border-[var(--color-error)]" : "border-transparent focus:border-[var(--color-outline-focus)]"}`}
                   />
@@ -150,7 +152,7 @@ export default function QuestionForm({ initial, onSave, onCancel, saving = false
                   type="button"
                   onClick={() => removeAlt(alt.key)}
                   disabled={alternatives.length <= 2}
-                  aria-label="Remove alternative"
+                  aria-label="Remover alternativa"
                   className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-[var(--color-on-surface-muted)] hover:bg-[var(--color-error-surface)] hover:text-[var(--color-error)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <span className="material-symbols-rounded" style={{ fontSize: 16 }}>
@@ -169,17 +171,17 @@ export default function QuestionForm({ initial, onSave, onCancel, saving = false
             <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
               add
             </span>
-            Add alternative
+            Adicionar alternativa
           </button>
         </div>
 
         {/* Actions — sticky on mobile */}
         <div className="flex gap-3 pt-2 sticky bottom-0 bg-[var(--color-surface-dim)] py-4 -mx-4 px-4 sm:static sm:bg-transparent sm:mx-0 sm:px-0 sm:py-0">
           <Button type="submit" loading={saving}>
-            {initial ? "Save changes" : "Create question"}
+            {initial ? "Salvar alterações" : "Criar questão"}
           </Button>
           <Button type="button" variant="outlined" onClick={onCancel} disabled={saving}>
-            Cancel
+            Cancelar
           </Button>
         </div>
       </div>

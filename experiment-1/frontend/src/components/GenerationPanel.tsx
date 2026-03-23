@@ -65,7 +65,10 @@ export default function GenerationPanel({ examId, addToast }: GenerationPanelPro
         answersUrl: getBatchAnswersUrl(result.batchId),
         count: result.count,
       });
-      addToast(`Generated ${result.count} exam${result.count !== 1 ? "s" : ""} successfully.`, "success");
+      addToast(
+        `${result.count} prova${result.count !== 1 ? "s" : ""} gerada${result.count !== 1 ? "s" : ""} com sucesso.`,
+        "success",
+      );
       loadBatches();
     } catch (e) {
       addToast((e as Error).message, "error");
@@ -84,7 +87,7 @@ export default function GenerationPanel({ examId, addToast }: GenerationPanelPro
               htmlFor="gen-count"
               className="text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide"
             >
-              Number of exams
+              Número de provas
             </label>
             <input
               id="gen-count"
@@ -97,7 +100,7 @@ export default function GenerationPanel({ examId, addToast }: GenerationPanelPro
             />
           </div>
           <Button icon="shuffle" loading={generating} onClick={handleGenerate}>
-            Generate
+            Gerar
           </Button>
         </div>
 
@@ -108,7 +111,7 @@ export default function GenerationPanel({ examId, addToast }: GenerationPanelPro
                 check_circle
               </span>
               <span className="text-sm text-[var(--color-success)]">
-                {lastResult.count} exam{lastResult.count !== 1 ? "s" : ""} generated
+                {lastResult.count} prova{lastResult.count !== 1 ? "s" : ""} gerada{lastResult.count !== 1 ? "s" : ""}
               </span>
             </div>
             <div className="flex gap-3">
@@ -132,7 +135,7 @@ export default function GenerationPanel({ examId, addToast }: GenerationPanelPro
                 <span className="material-symbols-rounded" style={{ fontSize: 16 }}>
                   download
                 </span>
-                Answer key
+                Gabarito
               </a>
             </div>
           </div>
@@ -141,7 +144,7 @@ export default function GenerationPanel({ examId, addToast }: GenerationPanelPro
 
       {/* History */}
       <div className="flex flex-col gap-3">
-        <h3 className="text-sm font-medium text-[var(--color-on-surface)]">Generation history</h3>
+        <h3 className="text-sm font-medium text-[var(--color-on-surface)]">Histórico de geração</h3>
 
         {loadingBatches ? (
           <div className="flex flex-col gap-2">
@@ -150,20 +153,20 @@ export default function GenerationPanel({ examId, addToast }: GenerationPanelPro
             ))}
           </div>
         ) : batches.length === 0 ? (
-          <p className="text-sm text-[var(--color-on-surface-muted)]">No batches generated yet.</p>
+          <p className="text-sm text-[var(--color-on-surface-muted)]">Nenhum lote gerado ainda.</p>
         ) : (
           <div className="rounded-xl border border-[var(--color-outline)] overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-[var(--color-surface-dim)]">
                   <th className="text-left px-4 py-2.5 text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide">
-                    Date
+                    Data
                   </th>
                   <th className="text-left px-4 py-2.5 text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide">
-                    Count
+                    Quantidade
                   </th>
                   <th className="text-left px-4 py-2.5 text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide hidden sm:table-cell">
-                    Sequence
+                    Sequência
                   </th>
                   <th className="text-right px-4 py-2.5 text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide">
                     Downloads

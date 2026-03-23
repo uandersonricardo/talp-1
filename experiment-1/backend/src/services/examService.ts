@@ -14,16 +14,16 @@ function validate(
   identifierMode: string,
   questionIds: string[],
 ): void {
-  if (!title?.trim()) throw new ServiceError(400, "title is required");
-  if (!course?.trim()) throw new ServiceError(400, "course is required");
-  if (!professor?.trim()) throw new ServiceError(400, "professor is required");
-  if (!date?.trim()) throw new ServiceError(400, "date is required");
+  if (!title?.trim()) throw new ServiceError(400, "Título é obrigatório");
+  if (!course?.trim()) throw new ServiceError(400, "Disciplina é obrigatória");
+  if (!professor?.trim()) throw new ServiceError(400, "Professor é obrigatório");
+  if (!date?.trim()) throw new ServiceError(400, "Data é obrigatória");
   if (!["letters", "powers"].includes(identifierMode))
-    throw new ServiceError(400, 'identifierMode must be "letters" or "powers"');
+    throw new ServiceError(400, 'Modo de identificação deve ser "letras" ou "potências"');
   if (!Array.isArray(questionIds) || questionIds.length < 1)
-    throw new ServiceError(400, "at least 1 question is required");
+    throw new ServiceError(400, "Pelo menos 1 questão é obrigatória");
   for (const qId of questionIds) {
-    if (!questions.find((q) => q.id === qId)) throw new ServiceError(400, `question not found: ${qId}`);
+    if (!questions.find((q) => q.id === qId)) throw new ServiceError(400, `Questão não encontrada: ${qId}`);
   }
 }
 
@@ -57,7 +57,7 @@ export function createExam(
 
 export function getExam(id: string): Exam {
   const exam = exams.find((e) => e.id === id);
-  if (!exam) throw new ServiceError(404, "exam not found");
+  if (!exam) throw new ServiceError(404, "Prova não encontrada");
   return exam;
 }
 
@@ -72,7 +72,7 @@ export function updateExam(
 ): Exam {
   validate(title, course, professor, date, identifierMode, questionIds);
   const idx = exams.findIndex((e) => e.id === id);
-  if (idx === -1) throw new ServiceError(404, "exam not found");
+  if (idx === -1) throw new ServiceError(404, "Prova não encontrada");
   exams[idx] = {
     id,
     title,
@@ -87,8 +87,8 @@ export function updateExam(
 
 export function deleteExam(id: string): void {
   const idx = exams.findIndex((e) => e.id === id);
-  if (idx === -1) throw new ServiceError(404, "exam not found");
+  if (idx === -1) throw new ServiceError(404, "Prova não encontrada");
   if (generationBatches.some((b) => b.examId === id))
-    throw new ServiceError(409, "exam has generated batches and cannot be deleted");
+    throw new ServiceError(409, "A prova possui lotes gerados e não pode ser excluída");
   exams.splice(idx, 1);
 }

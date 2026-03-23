@@ -5,7 +5,10 @@ type GradingMode = "strict" | "lenient";
 type IdentifierMode = "letters" | "powers";
 
 function parseCsv(text: string): { headers: string[]; rows: Record<string, string>[] } {
-  const lines = text.trim().split(/\r?\n/).filter((line) => line.trim() !== "");
+  const lines = text
+    .trim()
+    .split(/\r?\n/)
+    .filter((line) => line.trim() !== "");
   if (lines.length === 0) return { headers: [], rows: [] };
   const headers = lines[0].split(",");
   const rows = lines.slice(1).map((line) => {
@@ -74,14 +77,14 @@ function formatScore(score: number): string {
 
 export function gradeResponses(answerKeyCsv: string, responsesCsv: string, gradingMode: GradingMode): string {
   if (!["strict", "lenient"].includes(gradingMode)) {
-    throw new ServiceError(400, "mode must be 'strict' or 'lenient'");
+    throw new ServiceError(400, "Modo deve ser 'strict' ou 'lenient'");
   }
 
   const { headers: keyHeaders, rows: keyRows } = parseCsv(answerKeyCsv);
   const { headers: responseHeaders, rows: responseRows } = parseCsv(responsesCsv);
 
-  if (keyHeaders.length === 0) throw new ServiceError(400, "answer key CSV is empty");
-  if (responseHeaders.length === 0) throw new ServiceError(400, "responses CSV is empty");
+  if (keyHeaders.length === 0) throw new ServiceError(400, "CSV do gabarito está vazio");
+  if (responseHeaders.length === 0) throw new ServiceError(400, "CSV de respostas está vazio");
 
   // Question IDs are all columns after exam_number in the answer key
   const questionIds = keyHeaders.slice(1);
@@ -133,7 +136,7 @@ export function gradeResponses(answerKeyCsv: string, responsesCsv: string, gradi
 
     const keyRow = keyMap.get(examNum);
     if (!keyRow) {
-      console.warn(`Warning: exam_number ${examNum} not found in answer key`);
+      console.warn(`Aviso: número de prova ${examNum} não encontrado no gabarito`);
     }
 
     const perQuestionScores = questionIds.map((qId, i) => {

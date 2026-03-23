@@ -59,7 +59,7 @@ function FileDropZone({
           </span>
           <div className="text-center px-3">
             <p className="text-sm font-medium text-[var(--color-on-surface)]">{file.name}</p>
-            <p className="text-xs text-[var(--color-on-surface-muted)]">Click to replace</p>
+            <p className="text-xs text-[var(--color-on-surface-muted)]">Clique para substituir</p>
           </div>
         </>
       ) : (
@@ -69,7 +69,7 @@ function FileDropZone({
           </span>
           <div className="text-center px-3">
             <p className="text-sm font-medium text-[var(--color-on-surface)]">{label}</p>
-            <p className="text-xs text-[var(--color-on-surface-muted)]">Click or drag & drop a CSV file</p>
+            <p className="text-xs text-[var(--color-on-surface-muted)]">Clique ou arraste um arquivo CSV</p>
           </div>
         </>
       )}
@@ -90,7 +90,7 @@ export default function GradingForm({ addToast }: GradingFormProps) {
     setGrading(true);
     try {
       await gradeResponses(answersFile, responsesFile, mode);
-      addToast("Report downloaded successfully.", "success");
+      addToast("Relatório baixado com sucesso.", "success");
     } catch (e) {
       addToast((e as Error).message, "error");
     } finally {
@@ -104,10 +104,10 @@ export default function GradingForm({ addToast }: GradingFormProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-2">
           <span className="text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide">
-            Answer key
+            Gabarito
           </span>
           <FileDropZone
-            label="Upload answer key CSV"
+            label="Enviar gabarito em CSV"
             icon="vpn_key"
             file={answersFile}
             onFile={setAnswersFile}
@@ -116,10 +116,10 @@ export default function GradingForm({ addToast }: GradingFormProps) {
         </div>
         <div className="flex flex-col gap-2">
           <span className="text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide">
-            Student responses
+            Respostas dos alunos
           </span>
           <FileDropZone
-            label="Upload responses CSV"
+            label="Enviar respostas em CSV"
             icon="upload"
             file={responsesFile}
             onFile={setResponsesFile}
@@ -131,7 +131,7 @@ export default function GradingForm({ addToast }: GradingFormProps) {
       {/* Mode selector */}
       <div className="flex flex-col gap-3">
         <span className="text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide">
-          Grading mode
+          Modo de correção
         </span>
         <div className="flex gap-2">
           {(["strict", "lenient"] as const).map((m) => (
@@ -147,8 +147,8 @@ export default function GradingForm({ addToast }: GradingFormProps) {
                 }`}
               title={
                 m === "strict"
-                  ? "Answer must exactly match the key."
-                  : "Partial credit: score = correct selections / total alternatives."
+                  ? "A resposta deve corresponder exatamente ao gabarito."
+                  : "Crédito parcial: pontuação = seleções corretas / total de alternativas."
               }
             >
               {mode === m && (
@@ -156,21 +156,21 @@ export default function GradingForm({ addToast }: GradingFormProps) {
                   check
                 </span>
               )}
-              {m.charAt(0).toUpperCase() + m.slice(1)}
+              {m === "strict" ? "Estrito" : "Parcial"}
             </button>
           ))}
         </div>
         <p className="text-xs text-[var(--color-on-surface-muted)]">
           {mode === "strict"
-            ? "Strict: student answer must exactly match the key. Any deviation scores 0 for that question."
-            : "Lenient: partial credit based on the fraction of alternatives correctly selected or unselected."}
+            ? "Estrito: a resposta do aluno deve corresponder exatamente ao gabarito. Qualquer desvio pontua 0 nessa questão."
+            : "Parcial: crédito parcial com base na fração de alternativas corretamente selecionadas ou não selecionadas."}
         </p>
       </div>
 
       {/* Action */}
       <div>
         <Button icon="grading" disabled={!canGrade} loading={grading} onClick={handleGrade}>
-          Grade & download report
+          Corrigir e baixar relatório
         </Button>
       </div>
     </div>

@@ -15,7 +15,7 @@ export default function Pagination({ page, total, limit, onChange }: PaginationP
       <button
         onClick={() => onChange(page - 1)}
         disabled={page <= 1}
-        aria-label="Previous page"
+        aria-label="Página anterior"
         className="flex items-center justify-center w-8 h-8 rounded-lg text-[var(--color-on-surface)] hover:bg-[var(--color-surface-container)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
@@ -24,13 +24,13 @@ export default function Pagination({ page, total, limit, onChange }: PaginationP
       </button>
 
       <span className="text-sm text-[var(--color-on-surface-muted)]">
-        Page <strong className="text-[var(--color-on-surface)]">{page}</strong> of {totalPages}
+        Página <strong className="text-[var(--color-on-surface)]">{page}</strong> de {totalPages}
       </span>
 
       <button
         onClick={() => onChange(page + 1)}
         disabled={page >= totalPages}
-        aria-label="Next page"
+        aria-label="Próxima página"
         className="flex items-center justify-center w-8 h-8 rounded-lg text-[var(--color-on-surface)] hover:bg-[var(--color-surface-container)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         <span className="material-symbols-rounded" style={{ fontSize: 18 }}>

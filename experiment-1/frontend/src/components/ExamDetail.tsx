@@ -14,15 +14,15 @@ const formatDate = (d: string) => {
 
 export default function ExamDetail({ exam }: ExamDetailProps) {
   const fields: { label: string; value: string }[] = [
-    { label: "Title", value: exam.title },
-    { label: "Course", value: exam.course },
+    { label: "Título", value: exam.title },
+    { label: "Disciplina", value: exam.course },
     { label: "Professor", value: exam.professor },
-    { label: "Date", value: formatDate(exam.date) },
+    { label: "Data", value: formatDate(exam.date) },
     {
-      label: "Identifier mode",
-      value: exam.identifierMode === "letters" ? "Letters (A, B, C…)" : "Powers (1, 2, 4, 8…)",
+      label: "Modo de identificação",
+      value: exam.identifierMode === "letters" ? "Letras (A, B, C…)" : "Potências (1, 2, 4, 8…)",
     },
-    { label: "Questions", value: `${exam.questions.length} question${exam.questions.length !== 1 ? "s" : ""}` },
+    { label: "Questões", value: `${exam.questions.length} ${exam.questions.length !== 1 ? "questões" : "questão"}` },
   ];
 
   return (

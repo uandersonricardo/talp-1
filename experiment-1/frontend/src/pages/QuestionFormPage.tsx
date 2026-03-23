@@ -32,10 +32,10 @@ export default function QuestionFormPage() {
     try {
       if (id) {
         await updateQuestion(id, data);
-        addToast("Question updated.", "success");
+        addToast("Questão atualizada.", "success");
       } else {
         await createQuestion(data);
-        addToast("Question created.", "success");
+        addToast("Questão criada.", "success");
       }
       navigate("/questions");
     } catch (e) {
@@ -49,7 +49,7 @@ export default function QuestionFormPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-[22px] font-medium leading-7 text-[var(--color-on-surface)]">
-          {isEdit ? "Edit Question" : "New Question"}
+          {isEdit ? "Editar Questão" : "Nova Questão"}
         </h1>
       </div>
 

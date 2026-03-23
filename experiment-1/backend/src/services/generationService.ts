@@ -67,12 +67,15 @@ function buildPdf(exam: Exam, batchIndividuals: IndividualExam[]): Promise<Buffe
       ind.questionOrder.forEach((qId, qIdx) => {
         const question = questions.find((q) => q.id === qId)!;
         const altOrder = ind.alternativeOrders[qId];
-        doc.fontSize(12).text(`${qIdx + 1}. ${question.statement}`).moveDown(0.5);
+        doc
+          .fontSize(12)
+          .text(`${qIdx + 1}. ${question.statement}`)
+          .moveDown(0.5);
         altOrder.forEach((origIdx, shuffledPos) => {
           const label = alternativeLabel(exam.identifierMode, shuffledPos);
           doc.fontSize(11).text(`   ${label}) ${question.alternatives[origIdx].description}`);
         });
-        const ansLabel = exam.identifierMode === "letters" ? "Answer: ___" : "Sum: ___";
+        const ansLabel = exam.identifierMode === "letters" ? "Resposta: ___" : "Soma: ___";
         doc.moveDown(0.5).fontSize(11).text(ansLabel).moveDown(1);
       });
 
@@ -80,12 +83,12 @@ function buildPdf(exam: Exam, batchIndividuals: IndividualExam[]): Promise<Buffe
       doc
         .moveDown(2)
         .fontSize(12)
-        .text("Name: ________________________________")
+        .text("Nome: ________________________________")
         .moveDown(1)
         .text("CPF: _________________________________");
 
       // Sequence number
-      doc.moveDown(2).fontSize(9).text(`Exam #${ind.sequenceNumber}`, { align: "center" });
+      doc.moveDown(2).fontSize(9).text(`Prova #${ind.sequenceNumber}`, { align: "center" });
     }
 
     doc.end();
@@ -97,12 +100,12 @@ export async function generateBatch(
   count: unknown,
 ): Promise<{ batch: GenerationBatch; pdfUrl: string; answersUrl: string }> {
   if (!Number.isInteger(count) || (count as number) < 1) {
-    throw new ServiceError(400, "count must be a positive integer");
+    throw new ServiceError(400, "Quantidade deve ser um número inteiro positivo");
   }
   const n = count as number;
 
   const exam = exams.find((e) => e.id === examId);
-  if (!exam) throw new ServiceError(404, "exam not found");
+  if (!exam) throw new ServiceError(404, "Prova não encontrada");
 
   const existing = generationBatches.filter((b) => b.examId === examId);
   const sequenceNumberStart =
@@ -143,18 +146,18 @@ export async function generateBatch(
 
 export function getExamBatches(examId: string): GenerationBatch[] {
   const exam = exams.find((e) => e.id === examId);
-  if (!exam) throw new ServiceError(404, "exam not found");
+  if (!exam) throw new ServiceError(404, "Prova não encontrada");
   return generationBatches.filter((b) => b.examId === examId);
 }
 
 export function getBatchPdf(batchId: string): Buffer {
   const pdf = batchPdfs.get(batchId);
-  if (!pdf) throw new ServiceError(404, "batch not found");
+  if (!pdf) throw new ServiceError(404, "Lote não encontrado");
   return pdf;
 }
 
 export function getBatchAnswersCsv(batchId: string): string {
   const csv = batchCsvs.get(batchId);
-  if (csv === undefined) throw new ServiceError(404, "batch not found");
+  if (csv === undefined) throw new ServiceError(404, "Lote não encontrado");
   return csv;
 }

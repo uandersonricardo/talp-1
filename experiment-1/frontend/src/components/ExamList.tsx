@@ -27,7 +27,7 @@ export default function ExamList({ exams, total, page, loading, onPageChange, on
     setDeleting(true);
     try {
       await deleteExam(deleteTarget.id);
-      addToast("Exam deleted.", "success");
+      addToast("Prova excluída.", "success");
       onDeleted();
     } catch (e) {
       addToast((e as Error).message, "error");
@@ -38,7 +38,9 @@ export default function ExamList({ exams, total, page, loading, onPageChange, on
   };
 
   if (!loading && exams.length === 0) {
-    return <EmptyState icon="article" title="No exams yet" description="Create your first exam to get started." />;
+    return (
+      <EmptyState icon="article" title="Nenhuma prova ainda" description="Crie sua primeira prova para começar." />
+    );
   }
 
   const formatDate = (d: string) => {
@@ -57,16 +59,16 @@ export default function ExamList({ exams, total, page, loading, onPageChange, on
           <thead>
             <tr className="bg-[var(--color-surface-dim)]">
               <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide">
-                Title
+                Título
               </th>
               <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide hidden md:table-cell">
-                Course
+                Disciplina
               </th>
               <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide hidden md:table-cell">
-                Date
+                Data
               </th>
               <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide w-28">
-                Mode
+                Modo
               </th>
               <th className="w-28" />
             </tr>
@@ -107,7 +109,7 @@ export default function ExamList({ exams, total, page, loading, onPageChange, on
                     </td>
                     <td className="px-4 py-3">
                       <span className="inline-flex items-center h-6 px-2 rounded-full text-xs font-medium bg-[var(--color-surface-container)] text-[var(--color-on-surface-muted)]">
-                        {exam.identifierMode}
+                        {exam.identifierMode === "powers" ? "Potências" : "Letras"}
                       </span>
                     </td>
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
@@ -117,7 +119,7 @@ export default function ExamList({ exams, total, page, loading, onPageChange, on
                             e.stopPropagation();
                             navigate(`/exams/${exam.id}/edit`);
                           }}
-                          aria-label="Edit exam"
+                          aria-label="Editar prova"
                           className="flex items-center justify-center w-8 h-8 rounded-lg text-[var(--color-on-surface-muted)] hover:bg-[var(--color-surface-container)] hover:text-[var(--color-on-surface)] transition-colors"
                         >
                           <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
@@ -129,7 +131,7 @@ export default function ExamList({ exams, total, page, loading, onPageChange, on
                             e.stopPropagation();
                             setDeleteTarget(exam);
                           }}
-                          aria-label="Delete exam"
+                          aria-label="Excluir prova"
                           className="flex items-center justify-center w-8 h-8 rounded-lg text-[var(--color-on-surface-muted)] hover:bg-[var(--color-error-surface)] hover:text-[var(--color-error)] transition-colors"
                         >
                           <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
@@ -194,8 +196,8 @@ export default function ExamList({ exams, total, page, loading, onPageChange, on
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
         loading={deleting}
-        title="Delete exam?"
-        description={`"${deleteTarget?.title}" and all its data will be permanently deleted.`}
+        title="Excluir prova?"
+        description={`"${deleteTarget?.title}" e todos os seus dados serão excluídos permanentemente.`}
       />
     </>
   );

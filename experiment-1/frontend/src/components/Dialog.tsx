@@ -66,7 +66,7 @@ export default function Dialog({ open, onClose, title, description, children, ac
         {!actions && (
           <div className="flex justify-end gap-2 px-6 pb-4">
             <Button ref={firstFocusRef} variant="outlined" onClick={onClose}>
-              Close
+              Fechar
             </Button>
           </div>
         )}
@@ -91,7 +91,7 @@ export function ConfirmDialog({
   onConfirm,
   title,
   description,
-  confirmLabel = "Delete",
+  confirmLabel = "Excluir",
   loading = false,
 }: ConfirmDialogProps) {
   return (
@@ -103,7 +103,7 @@ export function ConfirmDialog({
       actions={
         <>
           <Button variant="outlined" onClick={onClose} disabled={loading}>
-            Cancel
+            Cancelar
           </Button>
           <Button variant="danger" onClick={onConfirm} loading={loading}>
             {confirmLabel}

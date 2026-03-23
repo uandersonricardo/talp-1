@@ -14,9 +14,9 @@ export default function QuestionsPage() {
     <div className="flex flex-col gap-6">
       {/* Page header */}
       <div className="flex items-start justify-between gap-4">
-        <h1 className="text-[22px] font-medium leading-7 text-[var(--color-on-surface)]">Questions</h1>
+        <h1 className="text-[22px] font-medium leading-7 text-[var(--color-on-surface)]">Questões</h1>
         <Button icon="add" onClick={() => navigate("/questions/new")} size="compact">
-          New Question
+          Nova Questão
         </Button>
       </div>
 
@@ -32,7 +32,7 @@ export default function QuestionsPage() {
           type="search"
           value={search}
           onChange={(e) => onSearch(e.target.value)}
-          placeholder="Search questions…"
+          placeholder="Buscar questões…"
           className="w-full h-10 pl-9 pr-4 rounded-lg border border-[var(--color-outline)] bg-[var(--color-surface-container)] text-sm text-[var(--color-on-surface)] placeholder:text-[var(--color-on-surface-muted)] focus:outline-none focus:border-[var(--color-outline-focus)]"
         />
       </div>

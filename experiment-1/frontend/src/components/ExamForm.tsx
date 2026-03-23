@@ -91,11 +91,11 @@ export default function ExamForm({ initial, onSave, onCancel, saving = false }: 
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
-    if (!form.title.trim()) errs.title = "Title is required.";
-    if (!form.course.trim()) errs.course = "Course is required.";
-    if (!form.professor.trim()) errs.professor = "Professor is required.";
-    if (!form.date) errs.date = "Date is required.";
-    if (selectedIds.length === 0) errs.questions = "Select at least one question.";
+    if (!form.title.trim()) errs.title = "Título é obrigatório.";
+    if (!form.course.trim()) errs.course = "Disciplina é obrigatória.";
+    if (!form.professor.trim()) errs.professor = "Professor é obrigatório.";
+    if (!form.date) errs.date = "Data é obrigatória.";
+    if (selectedIds.length === 0) errs.questions = "Selecione pelo menos uma questão.";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -127,7 +127,7 @@ export default function ExamForm({ initial, onSave, onCancel, saving = false }: 
             <span className="material-symbols-rounded shrink-0" style={{ fontSize: 18 }}>
               error
             </span>
-            <span>Please fix the errors below before saving.</span>
+            <span>Corrija os erros abaixo antes de salvar.</span>
           </div>
         )}
 
@@ -135,37 +135,37 @@ export default function ExamForm({ initial, onSave, onCancel, saving = false }: 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {/* Metadata */}
           <div className="flex flex-col gap-4">
-            <h2 className="text-base font-medium text-[var(--color-on-surface)]">Exam details</h2>
+            <h2 className="text-base font-medium text-[var(--color-on-surface)]">Detalhes da prova</h2>
 
             <Input
-              label="Title"
+              label="Título"
               value={form.title}
               onChange={field("title")}
-              placeholder="e.g. Midterm Calculus"
+              placeholder="ex.: Prova de Cálculo"
               error={errors.title}
             />
             <Input
-              label="Course"
+              label="Disciplina"
               value={form.course}
               onChange={field("course")}
-              placeholder="e.g. Calculus 101"
+              placeholder="ex.: Cálculo 101"
               error={errors.course}
             />
             <Input
               label="Professor"
               value={form.professor}
               onChange={field("professor")}
-              placeholder="e.g. Dr. Smith"
+              placeholder="ex.: Dr. Silva"
               error={errors.professor}
             />
-            <Input label="Date" type="date" value={form.date} onChange={field("date")} error={errors.date} />
+            <Input label="Data" type="date" value={form.date} onChange={field("date")} error={errors.date} />
             <Select
-              label="Identifier mode"
+              label="Modo de identificação"
               value={form.identifierMode}
               onChange={field("identifierMode")}
               options={[
-                { value: "letters", label: "Letters (A, B, C…)" },
-                { value: "powers", label: "Powers (1, 2, 4, 8…)" },
+                { value: "letters", label: "Letras (A, B, C…)" },
+                { value: "powers", label: "Potências (1, 2, 4, 8…)" },
               ]}
             />
           </div>
@@ -173,9 +173,11 @@ export default function ExamForm({ initial, onSave, onCancel, saving = false }: 
           {/* Question selector */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-medium text-[var(--color-on-surface)]">Questions</h2>
+              <h2 className="text-base font-medium text-[var(--color-on-surface)]">Questões</h2>
               {selectedIds.length > 0 && (
-                <span className="text-xs text-[var(--color-on-surface-muted)]">{selectedIds.length} selected</span>
+                <span className="text-xs text-[var(--color-on-surface-muted)]">
+                  {selectedIds.length} selecionada(s)
+                </span>
               )}
             </div>
 
@@ -194,7 +196,7 @@ export default function ExamForm({ initial, onSave, onCancel, saving = false }: 
                   type="search"
                   value={qSearch}
                   onChange={(e) => setQSearch(e.target.value)}
-                  placeholder="Search available questions…"
+                  placeholder="Buscar questões disponíveis…"
                   className="w-full h-9 pl-9 pr-3 rounded-lg border border-[var(--color-outline)] bg-[var(--color-surface-container)] text-sm text-[var(--color-on-surface)] placeholder:text-[var(--color-on-surface-muted)] focus:outline-none focus:border-[var(--color-outline-focus)]"
                 />
               </div>
@@ -206,7 +208,7 @@ export default function ExamForm({ initial, onSave, onCancel, saving = false }: 
                   </div>
                 ) : filteredAvailable.length === 0 ? (
                   <p className="text-sm text-[var(--color-on-surface-muted)] text-center py-6 px-4">
-                    {qSearch ? "No questions match your search." : "All questions have been added."}
+                    {qSearch ? "Nenhuma questão corresponde à busca." : "Todas as questões foram adicionadas."}
                   </p>
                 ) : (
                   filteredAvailable.map((q) => (
@@ -233,7 +235,7 @@ export default function ExamForm({ initial, onSave, onCancel, saving = false }: 
             {selectedIds.length > 0 && (
               <div className="flex flex-col gap-1">
                 <p className="text-xs font-medium text-[var(--color-on-surface-muted)] uppercase tracking-wide">
-                  Added — drag to reorder
+                  Adicionadas — arraste para reordenar
                 </p>
                 <div className="border border-[var(--color-outline)] rounded-lg divide-y divide-[var(--color-outline)] overflow-hidden">
                   {selectedIds.map((id, idx) => {
@@ -254,7 +256,7 @@ export default function ExamForm({ initial, onSave, onCancel, saving = false }: 
                             type="button"
                             onClick={() => moveUp(idx)}
                             disabled={idx === 0}
-                            aria-label="Move up"
+                            aria-label="Mover para cima"
                             className="flex items-center justify-center w-6 h-6 rounded text-[var(--color-on-surface-muted)] hover:bg-[var(--color-surface-container)] disabled:opacity-30 disabled:cursor-not-allowed"
                           >
                             <span className="material-symbols-rounded" style={{ fontSize: 14 }}>
@@ -265,7 +267,7 @@ export default function ExamForm({ initial, onSave, onCancel, saving = false }: 
                             type="button"
                             onClick={() => moveDown(idx)}
                             disabled={idx === selectedIds.length - 1}
-                            aria-label="Move down"
+                            aria-label="Mover para baixo"
                             className="flex items-center justify-center w-6 h-6 rounded text-[var(--color-on-surface-muted)] hover:bg-[var(--color-surface-container)] disabled:opacity-30 disabled:cursor-not-allowed"
                           >
                             <span className="material-symbols-rounded" style={{ fontSize: 14 }}>
@@ -275,7 +277,7 @@ export default function ExamForm({ initial, onSave, onCancel, saving = false }: 
                           <button
                             type="button"
                             onClick={() => toggleQuestion(id)}
-                            aria-label="Remove question"
+                            aria-label="Remover questão"
                             className="flex items-center justify-center w-6 h-6 rounded text-[var(--color-on-surface-muted)] hover:bg-[var(--color-error-surface)] hover:text-[var(--color-error)]"
                           >
                             <span className="material-symbols-rounded" style={{ fontSize: 14 }}>
@@ -295,10 +297,10 @@ export default function ExamForm({ initial, onSave, onCancel, saving = false }: 
         {/* Actions */}
         <div className="flex gap-3 pt-2 sticky bottom-0 bg-[var(--color-surface-dim)] py-4 -mx-4 px-4 sm:static sm:bg-transparent sm:mx-0 sm:px-0 sm:py-0">
           <Button type="submit" loading={saving}>
-            {initial ? "Save changes" : "Create exam"}
+            {initial ? "Salvar alterações" : "Criar prova"}
           </Button>
           <Button type="button" variant="outlined" onClick={onCancel} disabled={saving}>
-            Cancel
+            Cancelar
           </Button>
         </div>
       </div>
