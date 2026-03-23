@@ -4,6 +4,7 @@ import express from "express";
 
 import examsRouter from "./routes/exams";
 import { batchesRouter, examGenerationRouter } from "./routes/generation";
+import { gradingRouter } from "./routes/grading";
 import questionsRouter from "./routes/questions";
 
 dotenv.config();
@@ -17,6 +18,7 @@ app.use("/api/questions", questionsRouter);
 app.use("/api/exams", examsRouter);
 app.use("/api/exams", examGenerationRouter);
 app.use("/api/batches", batchesRouter);
+app.use("/api/grade", gradingRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
