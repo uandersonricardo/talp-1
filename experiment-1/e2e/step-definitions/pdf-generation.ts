@@ -326,8 +326,8 @@ Then("a download link for the PDF is available", async function (this: CustomWor
 Then("a download link for the answer key CSV is available", async function (this: CustomWorld) {
   await this.page.goto(`${FRONTEND_URL}/exams/${this.lastCreatedExam.id}`);
   const csvLink = this.page
-    .getByRole("link", { name: /answer key|csv/i })
-    .or(this.page.getByText(/download.*csv|answer key/i));
+    .getByRole("link", { name: /answer key|csv|gabarito/i })
+    .or(this.page.getByText(/download.*csv|answer key|gabarito/i));
   await expect(csvLink).toBeVisible({ timeout: 5000 });
 });
 
