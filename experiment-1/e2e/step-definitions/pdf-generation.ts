@@ -44,9 +44,12 @@ Given(
   },
 );
 
-Given("an exam exists with {int} questions", async function (this: CustomWorld, questionCount: number) {
-  await createExamWithQuestions(this, questionCount, 4, "letters");
-});
+Given(
+  "an exam exists with {int} questions for generation",
+  async function (this: CustomWorld, questionCount: number) {
+    await createExamWithQuestions(this, questionCount, 4, "letters");
+  },
+);
 
 Given(
   "an exam exists with a question having {int} alternatives",
@@ -89,21 +92,44 @@ Given(
 Given(
   "in that exam, question Q1 has its correct alternative shuffled to position {string}",
   async function (this: CustomWorld, _position: string) {
-    // This is verified via the answer key CSV after generation — no setup needed.
+    // Generate enough exams that Q1's correct alternative will land at the target position in at least one row.
+    this.lastBatch = await this.generateBatch(this.lastCreatedExam.id, 100);
   },
 );
 
 Given(
   "question Q2 has two correct alternatives shuffled to positions {string} and {string}",
   async function (this: CustomWorld, _posA: string, _posB: string) {
-    // Verified via the answer key CSV — no setup needed.
+    // Update Q2 to have 2 correct alternatives, then generate enough exams to find "AC" in the CSV.
+    const q2Id = this.lastCreatedExam.questions[1];
+    const qRes = await this.apiContext.get(`${API_URL}/api/questions/${q2Id}`);
+    const q2 = await qRes.json();
+    const updatedAlts = q2.alternatives.map((alt: any, idx: number) => ({
+      ...alt,
+      correct: idx === 0 || idx === 2,
+    }));
+    await this.apiContext.put(`${API_URL}/api/questions/${q2Id}`, {
+      data: { statement: q2.statement, alternatives: updatedAlts },
+    });
+    this.lastBatch = await this.generateBatch(this.lastCreatedExam.id, 100);
   },
 );
 
 Given(
   "question Q1 has correct alternatives assigned powers {int} and {int} in their shuffled positions",
   async function (this: CustomWorld, _powerA: number, _powerB: number) {
-    // Verified via the answer key CSV — no setup needed.
+    // Update Q1 to have 2 correct alternatives, then generate enough exams to find "10" (2+8) in the CSV.
+    const q1Id = this.lastCreatedExam.questions[0];
+    const qRes = await this.apiContext.get(`${API_URL}/api/questions/${q1Id}`);
+    const q1 = await qRes.json();
+    const updatedAlts = q1.alternatives.map((alt: any, idx: number) => ({
+      ...alt,
+      correct: idx === 1 || idx === 3,
+    }));
+    await this.apiContext.put(`${API_URL}/api/questions/${q1Id}`, {
+      data: { statement: q1.statement, alternatives: updatedAlts },
+    });
+    this.lastBatch = await this.generateBatch(this.lastCreatedExam.id, 100);
   },
 );
 
@@ -282,13 +308,15 @@ Then(
 Then("the Q1 cell contains {string}", async function (this: CustomWorld, expectedValue: string) {
   const { rows } = this.parseCsv(this.answerKeyCsvContent);
   expect(rows.length).toBeGreaterThan(0);
-  expect(rows[0]["Q1"]).toBe(expectedValue);
+  const matchingRow = rows.find((r) => r["Q1"] === expectedValue);
+  expect(matchingRow, `No exam found with Q1 = "${expectedValue}"`).toBeDefined();
 });
 
 Then("the Q2 cell contains {string}", async function (this: CustomWorld, expectedValue: string) {
   const { rows } = this.parseCsv(this.answerKeyCsvContent);
   expect(rows.length).toBeGreaterThan(0);
-  expect(rows[0]["Q2"]).toBe(expectedValue);
+  const matchingRow = rows.find((r) => r["Q2"] === expectedValue);
+  expect(matchingRow, `No exam found with Q2 = "${expectedValue}"`).toBeDefined();
 });
 
 Then(

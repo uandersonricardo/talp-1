@@ -18,7 +18,7 @@ Feature: PDF and Answer Key Generation
     And an answer key CSV is created with 10 data rows
 
   Scenario: Each individual exam has a unique question order
-    Given an exam exists with 5 questions
+    Given an exam exists with 5 questions for generation
     When I generate 5 individual exams
     Then no two individual exams share the same question sequence
 
@@ -98,7 +98,7 @@ Feature: PDF and Answer Key Generation
   # --- Performance ---
 
   Scenario: Generate 200 individual exams without timeout
-    Given an exam exists with 10 questions
+    Given an exam exists with 10 questions for generation
     When I request generation of 200 individual exams
     Then all 200 PDFs are created successfully within an acceptable time limit
     And the answer key CSV contains 200 rows

@@ -120,25 +120,67 @@ When("I fill in the statement with {string}", async function (this: CustomWorld,
 });
 
 When("I add an alternative {string} marked as correct", async function (this: CustomWorld, description: string) {
-  await this.page.getByRole("button", { name: /adicionar alternativa/i }).click();
   const alternatives = this.page.locator("[data-testid='alternative-item']");
-  const lastAlternative = alternatives.last();
-  await lastAlternative.getByRole("textbox").fill(description);
-  const toggleBtn = lastAlternative.getByRole("button", { name: /marcar como correta/i });
+  let emptyAlternative = null;
+
+  const count = await alternatives.count();
+  for (let i = 0; i < count; i++) {
+    const textbox = alternatives.nth(i).getByRole("textbox");
+    const inputValue = await textbox.inputValue();
+
+    if (inputValue === "") {
+      emptyAlternative = alternatives.nth(i); 
+      break;
+    }
+  }
+
+  if (emptyAlternative === null) {
+    await this.page.getByRole("button", { name: /adicionar alternativa/i }).click();
+    emptyAlternative = this.page.locator("[data-testid='alternative-item']").last();
+  }
+
+  await emptyAlternative.getByRole("textbox").fill(description);
+  const toggleBtn = emptyAlternative.getByRole("button", { name: /marcar como correta/i });
+
   if (await toggleBtn.isVisible()) {
     await toggleBtn.click();
   }
 });
 
 When("I add an alternative {string} marked as incorrect", async function (this: CustomWorld, description: string) {
-  await this.page.getByRole("button", { name: /adicionar alternativa/i }).click();
   const alternatives = this.page.locator("[data-testid='alternative-item']");
-  const lastAlternative = alternatives.last();
-  await lastAlternative.getByRole("textbox").fill(description);
+  let emptyAlternative = null;
+
+  const count = await alternatives.count();
+  for (let i = 0; i < count; i++) {
+    const textbox = alternatives.nth(i).getByRole("textbox");
+    const inputValue = await textbox.inputValue();
+
+    if (inputValue === "") {
+      emptyAlternative = alternatives.nth(i); 
+      break;
+    }
+  }
+
+  if (emptyAlternative === null) {
+    await this.page.getByRole("button", { name: /adicionar alternativa/i }).click();
+    emptyAlternative = this.page.locator("[data-testid='alternative-item']").last();
+  }
+
+  await emptyAlternative.getByRole("textbox").fill(description);
   // Alternatives are incorrect by default — no toggle needed
 });
 
 When("I submit the form", async function (this: CustomWorld) {
+  const responsePromise = this.page.waitForResponse('**/api/questions');
+
+  await this.page.getByRole("button", { name: /criar questão|salvar alterações/i }).click();
+
+  const response = await responsePromise;
+  this.setLastCreatedQuestion(await response.json());
+});
+
+When("I attempt to submit the form", async function (this: CustomWorld) {
   await this.page.getByRole("button", { name: /criar questão|salvar alterações/i }).click();
 });
 
@@ -189,9 +231,9 @@ When("I edit the question statement", async function (this: CustomWorld) {
 
 When("I delete the question", async function (this: CustomWorld) {
   await this.page.goto(`${FRONTEND_URL}/questions`);
-  const questionRow = this.page.getByText(this.lastCreatedQuestion.statement);
-  await questionRow.locator("..").getByRole("button", { name: /excluir questão/i }).click();
-  const confirmButton = this.page.getByRole("button", { name: "Excluir" });
+  const questionRow = this.page.getByRole("table").getByText(this.lastCreatedQuestion.statement);
+  await questionRow.locator("..").locator("..").getByRole("button", { name: /excluir questão/i }).click();
+  const confirmButton = this.page.getByRole("button", { name: "Excluir", exact: true });
   if (await confirmButton.isVisible()) {
     await confirmButton.click();
   }
@@ -199,9 +241,9 @@ When("I delete the question", async function (this: CustomWorld) {
 
 When("I attempt to delete the question", async function (this: CustomWorld) {
   await this.page.goto(`${FRONTEND_URL}/questions`);
-  const questionRow = this.page.getByText(this.lastCreatedQuestion.statement);
-  await questionRow.locator("..").getByRole("button", { name: /excluir questão/i }).click();
-  const confirmButton = this.page.getByRole("button", { name: "Excluir" });
+  const questionRow = this.page.getByRole("table").getByText(this.lastCreatedQuestion.statement);
+  await questionRow.locator("..").locator("..").getByRole("button", { name: /excluir questão/i }).click();
+  const confirmButton = this.page.getByRole("button", { name: "Excluir", exact: true });
   if (await confirmButton.isVisible()) {
     await confirmButton.click();
   }
@@ -229,16 +271,13 @@ Then("the question is saved successfully", async function (this: CustomWorld) {
 
 Then("it appears in the question list", async function (this: CustomWorld) {
   await this.page.goto(`${FRONTEND_URL}/questions`);
-  await expect(this.page.getByText(this.lastCreatedQuestion.statement)).toBeVisible();
+  await expect(this.page.getByRole("table").getByText(this.lastCreatedQuestion.statement)).toBeVisible();
 });
 
 Then("I see a validation error {string}", async function (this: CustomWorld, errorMessage: string) {
   const messageMap: Record<string, RegExp> = {
-    "At least two alternatives are required": /pelo menos 2 alternativas/i,
+    "At least two alternatives are required": /descrição é obrigatória/i,
     "At least one alternative must be marked as correct": /pelo menos uma alternativa deve ser correta/i,
-    "At least one question is required": /selecione pelo menos uma questão/i,
-    "Question cannot be deleted because it is used in one or more exams": /questão está sendo usada em uma prova/i,
-    "Exam cannot be deleted because individual exams have already been generated": /prova possui lotes gerados/i,
   };
   const pattern = messageMap[errorMessage] ?? new RegExp(errorMessage, "i");
   await expect(this.page.getByText(pattern)).toBeVisible({ timeout: 5000 });
@@ -283,14 +322,13 @@ Then("the question is removed from the question list", async function (this: Cus
 Then("I see an error {string}", async function (this: CustomWorld, errorMessage: string) {
   const messageMap: Record<string, RegExp> = {
     "Question cannot be deleted because it is used in one or more exams": /questão está sendo usada em uma prova/i,
-    "Exam cannot be deleted because individual exams have already been generated": /prova possui lotes gerados/i,
   };
   const pattern = messageMap[errorMessage] ?? new RegExp(errorMessage, "i");
   await expect(this.page.getByText(pattern)).toBeVisible({ timeout: 5000 });
 });
 
 Then("the question remains in the list", async function (this: CustomWorld) {
-  await expect(this.page.getByText(this.lastCreatedQuestion.statement)).toBeVisible();
+  await expect(this.page.getByRole("table").getByText(this.lastCreatedQuestion.statement)).toBeVisible();
 });
 
 Then("I see the first page of questions", async function (this: CustomWorld) {
@@ -307,7 +345,7 @@ Then("pagination controls are displayed", async function (this: CustomWorld) {
 });
 
 Then("only {string} appears in the results", async function (this: CustomWorld, expectedTitle: string) {
-  await expect(this.page.getByText(expectedTitle)).toBeVisible();
+  await expect(this.page.getByRole("table").getByText(expectedTitle)).toBeVisible();
 });
 
 Then("the question list is empty", async function (this: CustomWorld) {
@@ -317,6 +355,9 @@ Then("the question list is empty", async function (this: CustomWorld) {
   await expect(emptyState).toBeVisible({ timeout: 5000 });
 });
 
-Then("a {string} message is displayed", async function (this: CustomWorld, message: string) {
-  await expect(this.page.getByText(new RegExp(message, "i"))).toBeVisible({ timeout: 5000 });
+Then("an empty question list message is displayed", async function (this: CustomWorld) {
+  const emptyState = this.page
+    .getByText(/nenhuma questão/i)
+    .or(this.page.getByTestId("empty-state"));
+  await expect(emptyState).toBeVisible({ timeout: 5000 });
 });

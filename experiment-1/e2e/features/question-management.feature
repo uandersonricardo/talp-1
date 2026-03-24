@@ -27,7 +27,7 @@ Feature: Question Management
     Given I am on the question creation page
     When I fill in the statement with "Single alt question"
     And I add an alternative "Only option" marked as correct
-    And I submit the form
+    And I attempt to submit the form
     Then I see a validation error "At least two alternatives are required"
 
   Scenario: Fail to create a question with no correct alternative
@@ -35,7 +35,7 @@ Feature: Question Management
     When I fill in the statement with "No correct answer question"
     And I add an alternative "Option A" marked as incorrect
     And I add an alternative "Option B" marked as incorrect
-    And I submit the form
+    And I attempt to submit the form
     Then I see a validation error "At least one alternative must be marked as correct"
 
   Scenario: Fail to create a question with an empty statement
@@ -43,7 +43,7 @@ Feature: Question Management
     When I leave the statement empty
     And I add an alternative "Option A" marked as correct
     And I add an alternative "Option B" marked as incorrect
-    And I submit the form
+    And I attempt to submit the form
     Then I see a validation error indicating the statement is required
 
   # --- Edit ---
@@ -94,11 +94,13 @@ Feature: Question Management
 
   Scenario: Search questions by statement text
     Given questions exist with statements "Photosynthesis process" and "Newton's laws"
-    When I search for "Newton"
+    When I navigate to the question list page
+    And I search for "Newton"
     Then only "Newton's laws" appears in the results
 
   Scenario: Search returns no results for an unmatched term
     Given questions exist in the system
-    When I search for "xyznonexistent"
+    When I navigate to the question list page
+    And I search for "xyznonexistent"
     Then the question list is empty
-    And a "no results" message is displayed
+    And an empty question list message is displayed

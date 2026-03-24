@@ -1,11 +1,28 @@
 import { Given, When, Then, DataTable } from "@cucumber/cucumber";
 import { expect } from "@playwright/test";
 
-import { CustomWorld, FRONTEND_URL, API_URL } from "../support/world";
+import { API_URL, CustomWorld, FRONTEND_URL } from "../support/world";
 
 // ---------------------------------------------------------------------------
 // Given
 // ---------------------------------------------------------------------------
+
+Given("questions have been created for exam use", async function (this: CustomWorld) {
+  await this.createQuestion("Biology question", [
+    { description: "Option A", correct: true },
+    { description: "Option B", correct: false },
+  ]);
+
+  await this.createQuestion("Chemistry question", [
+    { description: "Option A", correct: true },
+    { description: "Option B", correct: false },
+  ]);
+  
+  await this.createQuestion("Math question", [
+    { description: "Option A", correct: true },
+    { description: "Option B", correct: false },
+  ]);
+});
 
 Given("I am on the exam creation page", async function (this: CustomWorld) {
   await this.page.goto(`${FRONTEND_URL}/exams/new`);
@@ -179,19 +196,29 @@ When("I select {int} existing questions", async function (this: CustomWorld, cou
 When(
   "I create an exam with identifier mode {string}",
   async function (this: CustomWorld, mode: string) {
+    const data = {
+      title: "Auto Exam",
+      course: "Test Course",
+      professor: "Dr. Test",
+      date: "2026-04-15",
+      "identifier mode": mode
+    };
+
     const question = await this.createQuestion("Auto question", [
       { description: "Option A", correct: true },
       { description: "Option B", correct: false },
     ]);
+
     await this.page.goto(`${FRONTEND_URL}/exams/new`);
-    await this.page.getByLabel(/título/i).fill("Auto Exam");
-    await this.page.getByLabel(/disciplina/i).fill("Test Course");
-    await this.page.getByLabel(/professor/i).fill("Dr. Test");
-    await this.page.getByLabel("Data").fill("2026-04-15");
+    await this.page.getByLabel(/título/i).fill(data["title"] ?? "");
+    await this.page.getByLabel(/disciplina/i).fill(data["course"] ?? "");
+    await this.page.getByLabel(/professor/i).fill(data["professor"] ?? "");
+    await this.page.getByLabel("Data").fill(data["date"] ?? "");
     await this.page.getByLabel(/modo de identificação/i).selectOption(mode);
+
     // Select the question we created
-    const questionButton = this.page.getByText(question.statement).locator("..").getByRole("button");
-    await questionButton.first().click();
+    const questionButton = this.page.getByText(question.statement).locator("..");
+    await questionButton.click();
   },
 );
 
@@ -229,8 +256,8 @@ When("I edit the exam and add a 4th question", async function (this: CustomWorld
     { description: "Option B", correct: false },
   ]);
   await this.page.reload();
-  const questionButton = this.page.getByText(newQuestion.statement).locator("..").getByRole("button");
-  await questionButton.first().click();
+  const questionButton = this.page.getByText(newQuestion.statement).locator("..");
+  await questionButton.click();
 });
 
 When("I edit the exam title", async function (this: CustomWorld) {
@@ -243,9 +270,9 @@ When("I edit the exam title", async function (this: CustomWorld) {
 
 When("I delete the exam", async function (this: CustomWorld) {
   await this.page.goto(`${FRONTEND_URL}/exams`);
-  const examRow = this.page.getByText(this.lastCreatedExam.title);
-  await examRow.locator("..").getByRole("button", { name: /excluir prova/i }).click();
-  const confirmButton = this.page.getByRole("button", { name: "Excluir" });
+  const examRow = this.page.getByRole("table").getByText(this.lastCreatedExam.title);
+  await examRow.locator("..").locator("..").getByRole("button", { name: /excluir prova/i }).click();
+  const confirmButton = this.page.getByRole("button", { name: "Excluir", exact: true });
   if (await confirmButton.isVisible()) {
     await confirmButton.click();
   }
@@ -253,9 +280,9 @@ When("I delete the exam", async function (this: CustomWorld) {
 
 When("I attempt to delete the exam", async function (this: CustomWorld) {
   await this.page.goto(`${FRONTEND_URL}/exams`);
-  const examRow = this.page.getByText(this.lastCreatedExam.title);
-  await examRow.locator("..").getByRole("button", { name: /excluir prova/i }).click();
-  const confirmButton = this.page.getByRole("button", { name: "Excluir" });
+  const examRow = this.page.getByRole("table").getByText(this.lastCreatedExam.title);
+  await examRow.locator("..").locator("..").getByRole("button", { name: /excluir prova/i }).click();
+  const confirmButton = this.page.getByRole("button", { name: "Excluir", exact: true  });
   if (await confirmButton.isVisible()) {
     await confirmButton.click();
   }
@@ -263,6 +290,30 @@ When("I attempt to delete the exam", async function (this: CustomWorld) {
 
 When("I navigate to the exam list page", async function (this: CustomWorld) {
   await this.page.goto(`${FRONTEND_URL}/exams`);
+});
+
+When("I attempt to submit the exam form", async function (this: CustomWorld) {
+  await this.page.getByRole("button", { name: /criar prova|salvar alterações/i }).click();
+});
+
+When("I submit the exam form", async function (this: CustomWorld) {
+  const responsePromise = this.page.waitForResponse('**/api/exams');
+
+  await this.page.getByRole("button", { name: /criar prova|salvar alterações/i }).click();
+
+  const response = await responsePromise;
+  this.setLastCreatedExam(await response.json());
+});
+
+When("I save the exam changes", async function (this: CustomWorld) {
+  await this.page.getByRole("button", { name: /salvar alterações/i }).click();
+});
+
+When("I search for exams matching {string}", async function (this: CustomWorld, query: string) {
+  const searchInput = this.page.getByRole("searchbox").or(this.page.getByPlaceholder(/buscar/i));
+  await searchInput.fill(query);
+  await this.page.waitForTimeout(400);
+  await this.page.waitForLoadState("networkidle");
 });
 
 // ---------------------------------------------------------------------------
@@ -276,7 +327,7 @@ Then("the exam is saved successfully", async function (this: CustomWorld) {
 
 Then("it appears in the exam list", async function (this: CustomWorld) {
   await this.page.goto(`${FRONTEND_URL}/exams`);
-  await expect(this.page.getByText(this.lastCreatedExam.title)).toBeVisible();
+  await expect(this.page.getByRole("table").getByText(this.lastCreatedExam.title)).toBeVisible();
 });
 
 Then("the exam is saved with identifier mode {string}", async function (this: CustomWorld, mode: string) {
@@ -314,7 +365,7 @@ Then("the exam is removed from the exam list", async function (this: CustomWorld
 });
 
 Then("the exam remains in the list", async function (this: CustomWorld) {
-  await expect(this.page.getByText(this.lastCreatedExam.title)).toBeVisible();
+  await expect(this.page.getByRole("table").getByText(this.lastCreatedExam.title)).toBeVisible();
 });
 
 Then("I see the first page of exams", async function (this: CustomWorld) {
@@ -327,4 +378,39 @@ Then("the exam list is empty", async function (this: CustomWorld) {
     .getByText(/nenhuma prova/i)
     .or(this.page.getByTestId("empty-state"));
   await expect(emptyState).toBeVisible({ timeout: 5000 });
+});
+
+Then("only {string} appears in the exam results", async function (this: CustomWorld, expectedTitle: string) {
+  await expect(this.page.getByRole("table").getByText(expectedTitle)).toBeVisible();
+});
+
+Then("exam list pagination controls are displayed", async function (this: CustomWorld) {
+  const pagination = this.page
+    .getByRole("navigation", { name: /pagination/i })
+    .or(this.page.locator("[data-testid='pagination']"))
+    .or(this.page.getByRole("button", { name: /próxima|anterior|next|previous/i }).first().locator(".."));
+  await expect(pagination).toBeVisible();
+});
+
+Then("an empty exam list message is displayed", async function (this: CustomWorld) {
+  const emptyState = this.page
+    .getByText(/nenhuma prova/i)
+    .or(this.page.getByTestId("empty-state"));
+  await expect(emptyState).toBeVisible({ timeout: 5000 });
+});
+
+Then("I see an exam form error {string}", async function (this: CustomWorld, errorMessage: string) {
+  const messageMap: Record<string, RegExp> = {
+    "At least one question is required": /selecione pelo menos uma questão/i,
+  };
+  const pattern = messageMap[errorMessage] ?? new RegExp(errorMessage, "i");
+  await expect(this.page.getByText(pattern)).toBeVisible({ timeout: 5000 });
+});
+
+Then("I see an exam deletion error {string}", async function (this: CustomWorld, errorMessage: string) {
+  const messageMap: Record<string, RegExp> = {
+    "Exam cannot be deleted because individual exams have already been generated": /prova possui lotes gerados/i,
+  };
+  const pattern = messageMap[errorMessage] ?? new RegExp(errorMessage, "i");
+  await expect(this.page.getByText(pattern)).toBeVisible({ timeout: 5000 });
 });

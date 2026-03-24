@@ -118,6 +118,7 @@ export default function QuestionForm({ initial, onSave, onCancel, saving = false
                     ? "bg-[var(--color-success-surface)] border-[var(--color-success)]/40"
                     : "bg-[var(--color-surface)] border-[var(--color-outline)]"
                 }`}
+                data-testid="alternative-item"
               >
                 <button
                   type="button"

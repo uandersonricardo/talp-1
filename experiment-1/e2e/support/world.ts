@@ -1,5 +1,6 @@
 import { World, IWorldOptions, setWorldConstructor } from "@cucumber/cucumber";
 import type { Browser, BrowserContext, Page, APIRequestContext } from "playwright";
+import type { ChildProcess } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
@@ -12,6 +13,7 @@ export class CustomWorld extends World {
   context!: BrowserContext;
   page!: Page;
   apiContext!: APIRequestContext;
+  serverProcess: ChildProcess | null = null;
 
   // Domain state shared across steps
   lastCreatedQuestion: any = null;
@@ -19,6 +21,7 @@ export class CustomWorld extends World {
   lastBatch: any = null;
   createdQuestionIds: string[] = [];
   createdExamIds: string[] = [];
+  currentFormData: Record<string, any> = {};
 
   // Grading state
   answerKeyCsvContent = "";
@@ -77,6 +80,12 @@ export class CustomWorld extends World {
     return question;
   }
 
+  /** Set lastCreatedQuestion and push createdQuestionIds */
+  async setLastCreatedQuestion(question: any) {
+    this.lastCreatedQuestion = question;
+    this.createdQuestionIds.push(question.id);
+  }
+
   /** Create an exam via the API and store its id. */
   async createExam(payload: {
     title: string;
@@ -88,9 +97,14 @@ export class CustomWorld extends World {
   }): Promise<any> {
     const res = await this.apiContext.post(`${API_URL}/api/exams`, { data: payload });
     const exam = await res.json();
+    this.setLastCreatedExam(exam);
+    return exam;
+  }
+
+  /** Set lastCreatedExam and push createdExamIds */
+  async setLastCreatedExam(exam: any) {
     this.lastCreatedExam = exam;
     this.createdExamIds.push(exam.id);
-    return exam;
   }
 
   /** Generate a batch for an exam via the API. */
@@ -113,6 +127,11 @@ export class CustomWorld extends World {
   async downloadBuffer(url: string): Promise<Buffer> {
     const res = await this.apiContext.get(url);
     return Buffer.from(await res.body());
+  }
+
+  /** Set current form data. */
+  setCurrentFormData(data: Record<string, any>) {
+    this.currentFormData = data;
   }
 }
 

@@ -149,7 +149,7 @@ Feature: Grading and Class Report
     Then the total score is 2 for exam_number 1
 
   Scenario: Strict grading in powers mode — wrong numeric sum scores 0
-    Given an exam was generated with 1 question in "powers" mode
+    Given an exam was generated with 2 questions in "powers" mode
     And the answer key CSV contains:
       | exam_number | Q1 |
       | 1           | 6  |

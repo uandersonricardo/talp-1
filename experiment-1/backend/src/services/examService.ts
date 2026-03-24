@@ -27,7 +27,7 @@ function validate(
   }
 }
 
-export function listExams(search: string | undefined, page = 1, limit = DEFAULT_LIMIT) {
+export function listExams(search?: string, page = 1, limit = DEFAULT_LIMIT) {
   const filtered = search
     ? exams.filter(
         (e) =>

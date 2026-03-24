@@ -34,7 +34,8 @@ function computeAnswer(mode: "letters" | "powers", altOrder: number[], alts: { c
 }
 
 function buildCsv(exam: Exam, batchIndividuals: IndividualExam[]): string {
-  const header = ["exam_number", ...exam.questions].join(",");
+  const questionLabels = exam.questions.map((_, i) => `Q${i + 1}`);
+  const header = ["exam_number", ...questionLabels].join(",");
   const rows = batchIndividuals.map((ind) => {
     const answers = exam.questions.map((qId) => {
       const question = questions.find((q) => q.id === qId)!;

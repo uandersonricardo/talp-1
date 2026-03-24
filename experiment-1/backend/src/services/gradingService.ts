@@ -96,28 +96,31 @@ export function gradeResponses(answerKeyCsv: string, responsesCsv: string, gradi
     if (examNum) keyMap.set(examNum, row);
   }
 
-  // Determine identifier mode: check DB first, then infer from values
+  // Determine identifier mode and total alternatives per question
+  const isQStyle = questionIds.length > 0 && questionIds.every((id) => /^Q\d+$/i.test(id));
+  const matchedExam =
+    exams.find((e) => questionIds.every((qId) => e.questions.includes(qId))) ??
+    (isQStyle ? exams.find((e) => e.questions.length === questionIds.length) : undefined);
+
   let identifierMode: IdentifierMode = "letters";
   if (questionIds.length > 0) {
-    const exam = exams.find((e) => questionIds.every((qId) => e.questions.includes(qId)));
-    identifierMode = exam ? exam.identifierMode : detectIdentifierMode(keyRows, questionIds);
+    identifierMode = matchedExam ? matchedExam.identifierMode : detectIdentifierMode(keyRows, questionIds);
   }
 
   // Total alternatives per question — needed for lenient grading
   const totalAltsMap = new Map<string, number>();
-  for (const qId of questionIds) {
-    const question = questions.find((q) => q.id === qId);
-    totalAltsMap.set(qId, question?.alternatives.length ?? 2);
-  }
+  questionIds.forEach((qId, i) => {
+    const resolvedQuestion = matchedExam
+      ? questions.find((q) => q.id === matchedExam.questions[i])
+      : questions.find((q) => q.id === qId);
+    totalAltsMap.set(qId, resolvedQuestion?.alternatives.length ?? 2);
+  });
 
   // Detect optional metadata columns in responses CSV
   const hasStudentName = responseHeaders.includes("student_name");
   const hasCpf = responseHeaders.includes("cpf");
 
-  // Question answer columns in responses CSV (positional, skipping metadata)
-  const skipCols = new Set(["exam_number", "student_name", "cpf"]);
-  const responseQuestionCols = responseHeaders.filter((h) => !skipCols.has(h));
-
+  const responseHeaderSet = new Set(responseHeaders);
   const reportLines: string[] = [];
 
   // Report header
@@ -125,7 +128,7 @@ export function gradeResponses(answerKeyCsv: string, responsesCsv: string, gradi
     "exam_number",
     ...(hasStudentName ? ["student_name"] : []),
     ...(hasCpf ? ["cpf"] : []),
-    ...questionIds.map((_, i) => `q${i + 1}_score`),
+    ...questionIds,
     "total_score",
   ];
   reportLines.push(headerCols.join(","));
@@ -139,9 +142,9 @@ export function gradeResponses(answerKeyCsv: string, responsesCsv: string, gradi
       console.warn(`Aviso: número de prova ${examNum} não encontrado no gabarito`);
     }
 
-    const perQuestionScores = questionIds.map((qId, i) => {
+    const perQuestionScores = questionIds.map((qId) => {
       const keyCell = keyRow ? (keyRow[qId] ?? "") : "";
-      const studentCell = responseQuestionCols[i] ? (responseRow[responseQuestionCols[i]] ?? "") : "";
+      const studentCell = responseHeaderSet.has(qId) ? (responseRow[qId] ?? "") : "";
 
       if (gradingMode === "strict") return gradeStrict(keyCell, studentCell);
       return gradeLenient(identifierMode, keyCell, studentCell, totalAltsMap.get(qId) ?? 2);

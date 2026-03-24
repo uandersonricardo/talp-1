@@ -18,6 +18,7 @@ examGenerationRouter.post("/:id/generate", async (req: Request, res: Response) =
       generatedAt: result.batch.generatedAt,
       pdfUrl: result.pdfUrl,
       answersUrl: result.answersUrl,
+      sequenceNumberStart: result.batch.sequenceNumberStart,
     });
   } catch (e) {
     if (e instanceof ServiceError) return res.status(e.statusCode).json({ error: e.message });
