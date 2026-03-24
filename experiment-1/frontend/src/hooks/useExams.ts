@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { listExams } from "../api/exams";
 import type { Exam } from "../types";
@@ -7,14 +7,17 @@ export function useExams() {
   const [exams, setExams] = useState<Exam[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async (p: number) => {
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const load = useCallback(async (p: number, s: string) => {
     setLoading(true);
     setError(null);
     try {
-      const result = await listExams({ page: p, limit: 20 });
+      const result = await listExams({ page: p, search: s, limit: 20 });
       setExams(result.data);
       setTotal(result.total);
     } catch (e) {
@@ -25,18 +28,28 @@ export function useExams() {
   }, []);
 
   useEffect(() => {
-    load(page);
-  }, [page, load]);
+    load(page, search);
+  }, [page, load]); // eslint-disable-line
 
-  const onPageChange = useCallback(
-    (p: number) => {
-      setPage(p);
-      load(p);
+  const onSearch = useCallback(
+    (s: string) => {
+      setSearch(s);
+      setPage(1);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => load(1, s), 300);
     },
     [load],
   );
 
-  const refresh = useCallback(() => load(page), [load, page]);
+  const onPageChange = useCallback(
+    (p: number) => {
+      setPage(p);
+      load(p, search);
+    },
+    [load, search],
+  );
 
-  return { exams, total, page, loading, error, onPageChange, refresh };
+  const refresh = useCallback(() => load(page, search), [load, page, search]);
+
+  return { exams, total, page, search, loading, error, onSearch, onPageChange, refresh };
 }

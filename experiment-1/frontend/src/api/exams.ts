@@ -1,10 +1,11 @@
 import type { Exam, PaginatedResponse } from "../types";
 import { apiFetch } from "./client";
 
-export function listExams(params: { page?: number; limit?: number } = {}): Promise<PaginatedResponse<Exam>> {
+export function listExams(params: { page?: number; limit?: number; search?: string } = {}): Promise<PaginatedResponse<Exam>> {
   const query = new URLSearchParams();
   if (params.page != null) query.set("page", String(params.page));
   if (params.limit != null) query.set("limit", String(params.limit));
+  if (params.search) query.set("search", params.search);
   const qs = query.toString();
   return apiFetch<PaginatedResponse<Exam>>(`/api/exams${qs ? `?${qs}` : ""}`);
 }

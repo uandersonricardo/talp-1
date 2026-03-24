@@ -8,7 +8,7 @@ import { useToast } from "../hooks/useToast";
 export default function ExamsPage() {
   const navigate = useNavigate();
   const { addToast } = useToast();
-  const { exams, total, page, loading, onPageChange, refresh } = useExams();
+  const { exams, total, page, search, loading, onSearch, onPageChange, refresh } = useExams();
 
   return (
     <div className="flex flex-col gap-6">
@@ -17,6 +17,23 @@ export default function ExamsPage() {
         <Button icon="add" onClick={() => navigate("/exams/new")} size="compact">
           Nova Prova
         </Button>
+      </div>
+
+      {/* Search bar */}
+      <div className="relative max-w-sm">
+        <span
+          className="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-on-surface-muted)] pointer-events-none"
+          style={{ fontSize: 18 }}
+        >
+          search
+        </span>
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => onSearch(e.target.value)}
+          placeholder="Buscar provas…"
+          className="w-full h-10 pl-9 pr-4 rounded-lg border border-[var(--color-outline)] bg-[var(--color-surface-container)] text-sm text-[var(--color-on-surface)] placeholder:text-[var(--color-on-surface-muted)] focus:outline-none focus:border-[var(--color-outline-focus)]"
+        />
       </div>
 
       <ExamList

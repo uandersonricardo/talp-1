@@ -9,7 +9,8 @@ const router = Router();
 router.get("/", (req: Request, res: Response) => {
   const page = Math.max(1, parseInt(req.query.page as string) || 1);
   const limit = Math.max(1, parseInt(req.query.limit as string) || 20);
-  res.json(listExams(page, limit));
+  const search = req.query.search as string | undefined;
+  res.json(listExams(search, page, limit));
 });
 
 router.post("/", (req: Request, res: Response) => {

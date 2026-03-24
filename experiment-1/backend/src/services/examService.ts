@@ -27,9 +27,17 @@ function validate(
   }
 }
 
-export function listExams(page = 1, limit = DEFAULT_LIMIT) {
-  const total = exams.length;
-  const data = exams.slice((page - 1) * limit, page * limit);
+export function listExams(search: string | undefined, page = 1, limit = DEFAULT_LIMIT) {
+  const filtered = search
+    ? exams.filter(
+        (e) =>
+          e.title.toLowerCase().includes(search.toLowerCase()) ||
+          e.course.toLowerCase().includes(search.toLowerCase()) ||
+          e.professor.toLowerCase().includes(search.toLowerCase()),
+      )
+    : exams;
+  const total = filtered.length;
+  const data = filtered.slice((page - 1) * limit, page * limit);
   return { data, page, limit, total };
 }
 
