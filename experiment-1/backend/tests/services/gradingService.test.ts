@@ -144,15 +144,15 @@ describe("gradeResponses: strict mode", () => {
     const responses = buildResponsesCSV(["exam_number", "student_name", "cpf", "q1"], [[1, "Alice", "12345", "A"]]);
     const report = gradeResponses(key, responses, "strict");
     const [header, row] = report.split("\n");
-    expect(header).toBe("exam_number,student_name,cpf,q1_score,total_score");
+    expect(header).toBe("exam_number,student_name,cpf,q1,total_score");
     expect(row).toBe("1,Alice,12345,1,1");
   });
 
-  it("report header uses q1_score, q2_score, etc.", () => {
+  it("report header uses the question IDs from the answer key", () => {
     const key = buildKeyCSV(["q1id", "q2id"], [{ examNum: 1, answers: ["A", "B"] }]);
-    const responses = buildResponsesCSV(["exam_number", "a1", "a2"], [[1, "A", "B"]]);
+    const responses = buildResponsesCSV(["exam_number", "q1id", "q2id"], [[1, "A", "B"]]);
     const header = gradeResponses(key, responses, "strict").split("\n")[0];
-    expect(header).toBe("exam_number,q1_score,q2_score,total_score");
+    expect(header).toBe("exam_number,q1id,q2id,total_score");
   });
 
   it("handles multiple student rows correctly", () => {
@@ -178,7 +178,7 @@ describe("gradeResponses: lenient mode (letters)", () => {
     const q = makeQuestion();
     makeExam([q.id], "letters");
     const key = buildKeyCSV([q.id], [{ examNum: 1, answers: ["A"] }]);
-    const responses = buildResponsesCSV(["exam_number", "a1"], [[1, "A"]]);
+    const responses = buildResponsesCSV(["exam_number", q.id], [[1, "A"]]);
     const report = gradeResponses(key, responses, "lenient");
     const score = report.split("\n")[1].split(",")[1];
     expect(Number(score)).toBe(1);
@@ -189,7 +189,7 @@ describe("gradeResponses: lenient mode (letters)", () => {
     const q = makeQuestion();
     makeExam([q.id], "letters");
     const key = buildKeyCSV([q.id], [{ examNum: 1, answers: ["A"] }]);
-    const responses = buildResponsesCSV(["exam_number", "a1"], [[1, "B"]]);
+    const responses = buildResponsesCSV(["exam_number", q.id], [[1, "B"]]);
     const report = gradeResponses(key, responses, "lenient");
     const score = report.split("\n")[1].split(",")[1];
     expect(Number(score)).toBe(0);
@@ -200,7 +200,7 @@ describe("gradeResponses: lenient mode (letters)", () => {
     const q = makeQuestion();
     makeExam([q.id], "letters");
     const key = buildKeyCSV([q.id], [{ examNum: 1, answers: ["A"] }]);
-    const responses = buildResponsesCSV(["exam_number", "a1"], [[1, ""]]);
+    const responses = buildResponsesCSV(["exam_number", q.id], [[1, ""]]);
     const report = gradeResponses(key, responses, "lenient");
     const score = report.split("\n")[1].split(",")[1];
     expect(Number(score)).toBe(0.5);
@@ -215,7 +215,7 @@ describe("gradeResponses: lenient mode (powers)", () => {
     const q = makeQuestion();
     makeExam([q.id], "powers");
     const key = buildKeyCSV([q.id], [{ examNum: 1, answers: ["1"] }]);
-    const responses = buildResponsesCSV(["exam_number", "a1"], [[1, "1"]]);
+    const responses = buildResponsesCSV(["exam_number", q.id], [[1, "1"]]);
     const report = gradeResponses(key, responses, "lenient");
     const score = report.split("\n")[1].split(",")[1];
     expect(Number(score)).toBe(1);
@@ -227,7 +227,7 @@ describe("gradeResponses: lenient mode (powers)", () => {
     const q = makeQuestion();
     makeExam([q.id], "powers");
     const key = buildKeyCSV([q.id], [{ examNum: 1, answers: ["1"] }]);
-    const responses = buildResponsesCSV(["exam_number", "a1"], [[1, "0"]]);
+    const responses = buildResponsesCSV(["exam_number", q.id], [[1, "0"]]);
     const report = gradeResponses(key, responses, "lenient");
     const score = report.split("\n")[1].split(",")[1];
     expect(Number(score)).toBe(0.5);
@@ -239,7 +239,7 @@ describe("gradeResponses: lenient mode (powers)", () => {
     const q = makeQuestion();
     makeExam([q.id], "powers");
     const key = buildKeyCSV([q.id], [{ examNum: 1, answers: ["1"] }]);
-    const responses = buildResponsesCSV(["exam_number", "a1"], [[1, "2"]]);
+    const responses = buildResponsesCSV(["exam_number", q.id], [[1, "2"]]);
     const report = gradeResponses(key, responses, "lenient");
     const score = report.split("\n")[1].split(",")[1];
     expect(Number(score)).toBe(0);
@@ -255,6 +255,6 @@ describe("gradeResponses: empty responses", () => {
     const report = gradeResponses(key, responses, "strict");
     const rows = report.split("\n");
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toBe("exam_number,q1_score,total_score");
+    expect(rows[0]).toBe("exam_number,q1,total_score");
   });
 });

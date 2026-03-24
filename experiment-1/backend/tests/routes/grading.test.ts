@@ -8,7 +8,12 @@ beforeEach(() => resetDb());
 
 // --- Helpers ---
 
-async function createQuestion(alts = [{ description: "Yes", correct: true }, { description: "No", correct: false }]) {
+async function createQuestion(
+  alts = [
+    { description: "Yes", correct: true },
+    { description: "No", correct: false },
+  ],
+) {
   const res = await request(app).post("/api/questions").send({
     statement: "Sample question?",
     alternatives: alts,
@@ -40,29 +45,20 @@ async function getAnswerKeyCsv(batchId: string): Promise<string> {
 
 // Build responses CSV matching an answer key CSV (student submits all correct answers)
 function buildPerfectResponses(answerKeyCsv: string): string {
-  const lines = answerKeyCsv.trim().split("\n");
-  const header = lines[0];
-  // Replace header column names with generic answer column names (same count)
-  const colCount = header.split(",").length - 1;
-  const responseHeader = ["exam_number", ...Array.from({ length: colCount }, (_, i) => `a${i + 1}`)].join(",");
-  // Use the same answer values as the key
-  const dataRows = lines.slice(1).map((line) => {
-    const [examNum, ...answers] = line.split(",");
-    return [examNum, ...answers].join(",");
-  });
-  return [responseHeader, ...dataRows].join("\n");
+  // Keep the same column names as the key so name-based grading lookup works
+  return answerKeyCsv.trim();
 }
 
 // Build responses CSV where all student answers are wrong/empty
 function buildEmptyResponses(answerKeyCsv: string): string {
   const lines = answerKeyCsv.trim().split("\n");
-  const colCount = lines[0].split(",").length - 1;
-  const responseHeader = ["exam_number", ...Array.from({ length: colCount }, (_, i) => `a${i + 1}`)].join(",");
+  const header = lines[0];
+  const colCount = header.split(",").length - 1;
   const dataRows = lines.slice(1).map((line) => {
     const examNum = line.split(",")[0];
     return [examNum, ...Array.from({ length: colCount }, () => "")].join(",");
   });
-  return [responseHeader, ...dataRows].join("\n");
+  return [header, ...dataRows].join("\n");
 }
 
 // --- POST /api/grade ---
@@ -161,7 +157,7 @@ describe("POST /api/grade", () => {
       .attach("responses", Buffer.from(responses), { filename: "responses.csv", contentType: "text/csv" });
 
     const header = res.text.split("\n")[0];
-    expect(header).toBe("exam_number,q1_score,total_score");
+    expect(header).toBe("exam_number,Q1,total_score");
   });
 
   it("strict mode: perfect responses → score 1 per question", async () => {

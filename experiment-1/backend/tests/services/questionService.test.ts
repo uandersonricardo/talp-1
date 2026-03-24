@@ -63,7 +63,7 @@ describe("questionService", () => {
         createQuestion("Q?", alts);
       } catch (e) {
         expect((e as ServiceError).statusCode).toBe(400);
-        expect((e as ServiceError).message).toMatch(/correct/);
+        expect((e as ServiceError).message).toMatch(/correta/i);
       }
     });
   });

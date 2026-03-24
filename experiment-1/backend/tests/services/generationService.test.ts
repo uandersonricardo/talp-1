@@ -2,12 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { batchCsvs, batchPdfs, generationBatches, resetDb } from "../../src/db";
 import { createExam } from "../../src/services/examService";
-import {
-  generateBatch,
-  getExamBatches,
-  getBatchAnswersCsv,
-  getBatchPdf,
-} from "../../src/services/generationService";
+import { generateBatch, getExamBatches, getBatchAnswersCsv, getBatchPdf } from "../../src/services/generationService";
 import { ServiceError, createQuestion } from "../../src/services/questionService";
 
 const validAlts = [
@@ -175,7 +170,7 @@ describe("generationService", () => {
       const result = await generateBatch(exam.id, 2);
       const csv = getBatchAnswersCsv(result.batch.id);
       const lines = csv.split("\n");
-      expect(lines[0]).toBe(`exam_number,${q.id}`);
+      expect(lines[0]).toBe(`exam_number,Q1`);
       expect(lines).toHaveLength(3); // header + 2 rows
     });
 

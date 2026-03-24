@@ -45,7 +45,7 @@ describe("examService", () => {
         createExam("", "Math", "Dr. X", "2026-04-15", "letters", [q.id]);
       } catch (e) {
         expect((e as ServiceError).statusCode).toBe(400);
-        expect((e as ServiceError).message).toMatch(/title/);
+        expect((e as ServiceError).message).toMatch(/título/i);
       }
     });
 
@@ -55,7 +55,7 @@ describe("examService", () => {
         createExam("Midterm", "", "Dr. X", "2026-04-15", "letters", [q.id]);
       } catch (e) {
         expect((e as ServiceError).statusCode).toBe(400);
-        expect((e as ServiceError).message).toMatch(/course/);
+        expect((e as ServiceError).message).toMatch(/disciplina/i);
       }
     });
 
@@ -65,7 +65,7 @@ describe("examService", () => {
         createExam("Midterm", "Math", "", "2026-04-15", "letters", [q.id]);
       } catch (e) {
         expect((e as ServiceError).statusCode).toBe(400);
-        expect((e as ServiceError).message).toMatch(/professor/);
+        expect((e as ServiceError).message).toMatch(/professor/i);
       }
     });
 
@@ -75,7 +75,7 @@ describe("examService", () => {
         createExam("Midterm", "Math", "Dr. X", "", "letters", [q.id]);
       } catch (e) {
         expect((e as ServiceError).statusCode).toBe(400);
-        expect((e as ServiceError).message).toMatch(/date/);
+        expect((e as ServiceError).message).toMatch(/data/i);
       }
     });
 
@@ -85,7 +85,7 @@ describe("examService", () => {
         createExam("Midterm", "Math", "Dr. X", "2026-04-15", "invalid", [q.id]);
       } catch (e) {
         expect((e as ServiceError).statusCode).toBe(400);
-        expect((e as ServiceError).message).toMatch(/identifierMode/);
+        expect((e as ServiceError).message).toMatch(/identifica/i);
       }
     });
 
@@ -94,7 +94,7 @@ describe("examService", () => {
         createExam("Midterm", "Math", "Dr. X", "2026-04-15", "letters", []);
       } catch (e) {
         expect((e as ServiceError).statusCode).toBe(400);
-        expect((e as ServiceError).message).toMatch(/question/);
+        expect((e as ServiceError).message).toMatch(/quest/i);
       }
     });
 
@@ -103,7 +103,7 @@ describe("examService", () => {
         createExam("Midterm", "Math", "Dr. X", "2026-04-15", "letters", ["non-existent-id"]);
       } catch (e) {
         expect((e as ServiceError).statusCode).toBe(400);
-        expect((e as ServiceError).message).toMatch(/question not found/);
+        expect((e as ServiceError).message).toMatch(/não encontrada/i);
       }
     });
 
@@ -133,11 +133,11 @@ describe("examService", () => {
     });
 
     it("paginates correctly", () => {
-      const page1 = listExams(1, 2);
+      const page1 = listExams(undefined, 1, 2);
       expect(page1.data).toHaveLength(2);
       expect(page1.total).toBe(3);
 
-      const page2 = listExams(2, 2);
+      const page2 = listExams(undefined, 2, 2);
       expect(page2.data).toHaveLength(1);
     });
 

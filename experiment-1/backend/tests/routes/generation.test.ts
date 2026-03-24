@@ -9,26 +9,30 @@ beforeEach(() => resetDb());
 // Helpers
 
 async function createQuestion() {
-  const res = await request(app).post("/api/questions").send({
-    statement: "Sample question?",
-    alternatives: [
-      { description: "Yes", correct: true },
-      { description: "No", correct: false },
-    ],
-  });
+  const res = await request(app)
+    .post("/api/questions")
+    .send({
+      statement: "Sample question?",
+      alternatives: [
+        { description: "Yes", correct: true },
+        { description: "No", correct: false },
+      ],
+    });
   return res.body.id as string;
 }
 
 async function createExam(questionIds: string[], overrides = {}) {
-  const res = await request(app).post("/api/exams").send({
-    title: "Midterm",
-    course: "Math 101",
-    professor: "Dr. Smith",
-    date: "2026-04-15",
-    identifierMode: "letters",
-    questions: questionIds,
-    ...overrides,
-  });
+  const res = await request(app)
+    .post("/api/exams")
+    .send({
+      title: "Midterm",
+      course: "Math 101",
+      professor: "Dr. Smith",
+      date: "2026-04-15",
+      identifierMode: "letters",
+      questions: questionIds,
+      ...overrides,
+    });
   return res.body.id as string;
 }
 
@@ -154,11 +158,14 @@ describe("GET /api/batches/:batchId/pdf", () => {
     const gen = await request(app).post(`/api/exams/${examId}/generate`).send({ count: 1 });
     const batchId = gen.body.batchId;
 
-    const res = await request(app).get(`/api/batches/${batchId}/pdf`).buffer(true).parse((res, callback) => {
-      const chunks: Buffer[] = [];
-      res.on("data", (c: Buffer) => chunks.push(c));
-      res.on("end", () => callback(null, Buffer.concat(chunks)));
-    });
+    const res = await request(app)
+      .get(`/api/batches/${batchId}/pdf`)
+      .buffer(true)
+      .parse((res, callback) => {
+        const chunks: Buffer[] = [];
+        res.on("data", (c: Buffer) => chunks.push(c));
+        res.on("end", () => callback(null, Buffer.concat(chunks)));
+      });
     expect(res.body.slice(0, 4).toString()).toBe("%PDF");
   });
 
@@ -204,7 +211,7 @@ describe("GET /api/batches/:batchId/answers.csv", () => {
 
     const res = await request(app).get(`/api/batches/${batchId}/answers.csv`);
     const header = res.text.split("\n")[0];
-    expect(header).toBe(`exam_number,${qId}`);
+    expect(header).toBe(`exam_number,Q1`);
   });
 
   it("returns 404 for unknown batchId", async () => {
