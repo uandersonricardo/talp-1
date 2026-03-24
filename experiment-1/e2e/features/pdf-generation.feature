@@ -83,7 +83,7 @@ Feature: PDF and Answer Key Generation
   # --- Idempotent Batching ---
 
   Scenario: Re-generating exams creates a new batch with continuing sequence numbers
-    Given an exam already has a batch of 5 individual exams (sequence numbers 1–5)
+    Given an exam already has a batch of 5 individual exams
     When I generate 3 more individual exams
     Then the new individual exams are numbered 6, 7, and 8
     And the previous individual exams remain unchanged
