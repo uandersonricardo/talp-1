@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-import type { Student } from "../types";
+import type { Class, Student } from "../types";
 
 const DATA_DIR = path.resolve(__dirname, "../data");
 
@@ -35,4 +35,12 @@ export function readStudents(): Student[] {
 
 export function writeStudents(students: Student[]): void {
   writeFile("students.json", students);
+}
+
+export function readClasses(): Class[] {
+  return readFile<Class>("classes.json");
+}
+
+export function writeClasses(classes: Class[]): void {
+  writeFile("classes.json", classes);
 }
