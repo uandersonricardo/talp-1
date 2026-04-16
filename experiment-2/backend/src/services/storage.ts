@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-import type { Class, Student } from "../types";
+import type { Class, EmailQueueEntry, Evaluation, Student } from "../types";
 
 const DATA_DIR = path.resolve(__dirname, "../data");
 
@@ -43,4 +43,20 @@ export function readClasses(): Class[] {
 
 export function writeClasses(classes: Class[]): void {
   writeFile("classes.json", classes);
+}
+
+export function readEvaluations(): Evaluation[] {
+  return readFile<Evaluation>("evaluations.json");
+}
+
+export function writeEvaluations(evaluations: Evaluation[]): void {
+  writeFile("evaluations.json", evaluations);
+}
+
+export function readEmailQueue(): EmailQueueEntry[] {
+  return readFile<EmailQueueEntry>("email-queue.json");
+}
+
+export function writeEmailQueue(queue: EmailQueueEntry[]): void {
+  writeFile("email-queue.json", queue);
 }

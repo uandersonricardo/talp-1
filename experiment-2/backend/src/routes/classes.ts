@@ -1,7 +1,9 @@
 import { randomUUID } from "crypto";
 import { Router } from "express";
 
-import { readClasses, writeClasses } from "../services/storage";
+import { enqueue } from "../services/emailQueue";
+import { readClasses, readEvaluations, writeClasses, writeEvaluations } from "../services/storage";
+import type { Grade } from "../types";
 
 const router = Router();
 
@@ -120,4 +122,58 @@ router.delete("/:id/students/:studentId", (req, res) => {
   res.json({ data: classes[index] });
 });
 
+const VALID_GRADES = new Set<string>(["MANA", "MPA", "MA"]);
+
+router.get("/:classId/evaluations", (req, res) => {
+  const { classId } = req.params;
+  const evaluations = readEvaluations().filter((e) => e.classId === classId);
+  res.json({ data: evaluations });
+});
+
+router.put("/:classId/evaluations", (req, res) => {
+  const { classId } = req.params;
+  const { studentId, goalId, grade } = req.body as { studentId: unknown; goalId: unknown; grade: unknown };
+
+  const classes = readClasses();
+  if (!classes.some((c) => c.id === classId)) {
+    res.status(404).json({ error: "Class not found" });
+    return;
+  }
+
+  if (typeof studentId !== "string" || !studentId.trim()) {
+    res.status(400).json({ error: "studentId is required" });
+    return;
+  }
+  if (typeof goalId !== "string" || !goalId.trim()) {
+    res.status(400).json({ error: "goalId is required" });
+    return;
+  }
+  if (!VALID_GRADES.has(grade as string)) {
+    res.status(400).json({ error: "grade must be MANA, MPA, or MA" });
+    return;
+  }
+
+  const sid = studentId.trim();
+  const gid = goalId.trim();
+  const g = grade as Grade;
+
+  const evaluations = readEvaluations();
+  const index = evaluations.findIndex((e) => e.classId === classId && e.studentId === sid && e.goalId === gid);
+  const updatedAt = new Date().toISOString();
+
+  if (index === -1) {
+    const evaluation = { id: randomUUID(), classId, studentId: sid, goalId: gid, grade: g, updatedAt };
+    evaluations.push(evaluation);
+    writeEvaluations(evaluations);
+    enqueue(sid, classId, gid, g);
+    res.status(201).json({ data: evaluation });
+  } else {
+    evaluations[index] = { ...evaluations[index], grade: g, updatedAt };
+    writeEvaluations(evaluations);
+    enqueue(sid, classId, gid, g);
+    res.json({ data: evaluations[index] });
+  }
+});
+
 export default router;
+
