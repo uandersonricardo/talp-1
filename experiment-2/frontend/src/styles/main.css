@@ -1,1 +1,56 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
 @import "tailwindcss";
+
+:root {
+  --color-bg: #f8f9ff;
+  --color-surface: #ffffff;
+  --color-surface-variant: #f0f4ff;
+  --color-border: #e2e6f0;
+  --color-border-strong: #c5cbdc;
+  --color-primary: #1a6ef5;
+  --color-primary-hover: #1558d0;
+  --color-primary-subtle: #ebf1fe;
+  --color-text-primary: #1c1e2b;
+  --color-text-secondary: #5c6278;
+  --color-text-disabled: #a9afbf;
+  --color-destructive: #d93025;
+  --color-destructive-subtle: #fdecea;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@utility animate-modal {
+  animation: modal-in 150ms ease-out;
+}
+
+@utility animate-toast-in {
+  animation: toast-in 200ms ease-out;
+}
