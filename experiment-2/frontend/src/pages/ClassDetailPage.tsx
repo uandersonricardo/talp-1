@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, ClipboardList, Trash2, UserPlus } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { Modal } from "../components/Modal";
 import { useToast } from "../components/Toast";
@@ -32,7 +32,6 @@ interface GradeModalState {
 
 export function ClassDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
@@ -80,8 +79,7 @@ export function ClassDetailPage() {
 
   const isLoading =
     classesQuery.isLoading || studentsQuery.isLoading || goalsQuery.isLoading || evaluationsQuery.isLoading;
-  const isError =
-    classesQuery.isError || studentsQuery.isError || goalsQuery.isError || evaluationsQuery.isError;
+  const isError = classesQuery.isError || studentsQuery.isError || goalsQuery.isError || evaluationsQuery.isError;
 
   const cls = classesQuery.data?.find((c) => c.id === id);
 
@@ -158,10 +156,7 @@ export function ClassDetailPage() {
           <ChevronLeft size={16} />
           Turmas
         </Link>
-        <h1
-          data-testid="class-title"
-          className="text-xl font-semibold text-[var(--color-text-primary)]"
-        >
+        <h1 data-testid="class-title" className="text-xl font-semibold text-[var(--color-text-primary)]">
           {cls!.description}
         </h1>
         <p className="text-sm text-[var(--color-text-secondary)] mt-1">
