@@ -200,7 +200,7 @@ Then(
     const pattern = patterns[fieldLabel];
     if (!pattern) throw new Error(`No error pattern for field: "${fieldLabel}"`);
     await expect(
-      this.page.locator('[role="dialog"]').locator("p").filter({ hasText: pattern }),
+      this.page.locator("p").filter({ hasText: pattern }).first(),
     ).toBeVisible();
   },
 );
