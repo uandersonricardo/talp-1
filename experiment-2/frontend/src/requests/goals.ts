@@ -20,3 +20,24 @@ export async function listGoals(): Promise<Goal[]> {
   const res = await fetch(`${BASE_URL}/api/goals`);
   return handleResponse<Goal[]>(res);
 }
+
+export async function createGoal(data: Omit<Goal, "id">): Promise<Goal> {
+  const res = await fetch(`${BASE_URL}/api/goals`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Goal>(res);
+}
+
+export async function deleteGoal(id: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/api/goals/${id}`, { method: "DELETE" });
+  if (!res.ok) {
+    const json: unknown = await res.json();
+    const message =
+      typeof json === "object" && json !== null && "error" in json
+        ? String((json as { error: unknown }).error)
+        : "Erro inesperado";
+    throw new Error(message);
+  }
+}
