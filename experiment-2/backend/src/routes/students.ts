@@ -27,6 +27,14 @@ router.post("/", (req, res) => {
   }
 
   const students = readStudents();
+
+  const normalize = (s: string) => s.replace(/\D/g, "");
+  const duplicate = students.find((s) => normalize(s.cpf) === normalize(cpf.trim()));
+  if (duplicate) {
+    res.status(409).json({ error: "CPF já cadastrado" });
+    return;
+  }
+
   const student = { id: randomUUID(), name: name.trim(), cpf: cpf.trim(), email: email.trim() };
   students.push(student);
   writeStudents(students);
