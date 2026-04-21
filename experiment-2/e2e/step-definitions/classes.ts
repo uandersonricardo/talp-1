@@ -92,7 +92,10 @@ Given(
   async function (this: World, studentName: string, classDescription: string) {
     let cls = await this.getClassByDescription(classDescription);
     if (!cls) cls = await this.createClass(classDescription, 2026, 1);
-    const student = await this.createStudentAuto(studentName);
+    // Reuse the existing student if one with this name already exists (e.g. created
+    // by a Background step) so that cross-class tests work against the same ID.
+    let student = await this.getStudentByName(studentName);
+    if (!student) student = await this.createStudentAuto(studentName);
     await this.enrollStudentInClass(cls.id, student.id);
     await this.reloadPage();
   },

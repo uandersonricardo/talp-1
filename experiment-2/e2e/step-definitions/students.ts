@@ -67,7 +67,9 @@ Given(
 Given(
   "a student {string} with email {string} is registered",
   async function (this: World, name: string, email: string) {
-    await this.createStudent(name, DEFAULT_CPF, email);
+    // Use a unique auto-generated CPF to avoid 409 conflicts when multiple
+    // students are created with the same DEFAULT_CPF in the same scenario.
+    await this.createStudentAuto(name, email);
     await this.reloadPage();
   },
 );

@@ -8,6 +8,22 @@ const GRADE_LABELS: Record<Grade, string> = {
   MA: "Meta Atingida",
 };
 
+// ─── In-memory capture for tests ─────────────────────────────────────────────
+// Every call to sendDigestEmail appends here regardless of SMTP config, so
+// test-only routes can inspect what would have been sent.
+
+const capturedEmails: Array<{ to: string; subject: string; text: string }> = [];
+
+export function getCapturedEmails(): Array<{ to: string; subject: string; text: string }> {
+  return [...capturedEmails];
+}
+
+export function clearCapturedEmails(): void {
+  capturedEmails.length = 0;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 export function logSmtpWarning(): void {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM } = process.env;
   if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !SMTP_FROM) {
@@ -34,19 +50,20 @@ export function buildEmailBody(
     "",
   ];
 
-  const byClass = new Map<string, Array<{ goalId: string; grade: Grade }>>();
+  // Group by class, keeping only the latest grade per (classId, goalId) pair.
+  const byClass = new Map<string, Map<string, Grade>>();
   for (const u of updates) {
-    const list = byClass.get(u.classId) ?? [];
-    list.push({ goalId: u.goalId, grade: u.grade });
-    byClass.set(u.classId, list);
+    const classGoals = byClass.get(u.classId) ?? new Map<string, Grade>();
+    classGoals.set(u.goalId, u.grade); // last write wins
+    byClass.set(u.classId, classGoals);
   }
 
-  for (const [classId, classUpdates] of byClass) {
+  for (const [classId, classGoals] of byClass) {
     const cls = classes.find((c) => c.id === classId);
     lines.push(`Turma: ${cls?.description ?? classId}`);
-    for (const u of classUpdates) {
-      const goal = goals.find((g) => g.id === u.goalId);
-      lines.push(`  - ${goal?.name ?? u.goalId}: ${GRADE_LABELS[u.grade]}`);
+    for (const [goalId, grade] of classGoals) {
+      const goal = goals.find((g) => g.id === goalId);
+      lines.push(`  - ${goal?.name ?? goalId}: ${GRADE_LABELS[grade]}`);
     }
     lines.push("");
   }
@@ -63,6 +80,12 @@ export async function sendDigestEmail(
   classes: Class[],
   goals: Goal[],
 ): Promise<void> {
+  const subject = `Avaliações atualizadas — ${formatDate(date)}`;
+  const text = buildEmailBody(student, updates, date, classes, goals);
+
+  // Always capture so tests can inspect sent emails without a real SMTP server.
+  capturedEmails.push({ to: student.email, subject, text });
+
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM } = process.env;
   if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !SMTP_FROM) return;
 
@@ -72,10 +95,5 @@ export async function sendDigestEmail(
     auth: { user: SMTP_USER, pass: SMTP_PASS },
   });
 
-  await transporter.sendMail({
-    from: SMTP_FROM,
-    to: student.email,
-    subject: `Avaliações atualizadas — ${formatDate(date)}`,
-    text: buildEmailBody(student, updates, date, classes, goals),
-  });
+  await transporter.sendMail({ from: SMTP_FROM, to: student.email, subject, text });
 }

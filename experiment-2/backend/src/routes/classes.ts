@@ -168,9 +168,10 @@ router.put("/:classId/evaluations", (req, res) => {
     enqueue(sid, classId, gid, g);
     res.status(201).json({ data: evaluation });
   } else {
+    const gradeChanged = evaluations[index].grade !== g;
     evaluations[index] = { ...evaluations[index], grade: g, updatedAt };
     writeEvaluations(evaluations);
-    enqueue(sid, classId, gid, g);
+    if (gradeChanged) enqueue(sid, classId, gid, g);
     res.json({ data: evaluations[index] });
   }
 });

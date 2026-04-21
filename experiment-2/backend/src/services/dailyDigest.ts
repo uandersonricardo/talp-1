@@ -9,6 +9,12 @@ export function startDailyDigest(): void {
 
 export async function runDigest(): Promise<void> {
   const today = new Date().toISOString().slice(0, 10);
+  await runDigestAt(today);
+}
+
+// runDigestAt processes all queue entries whose date is strictly before asOfDate.
+// Pass a future date (e.g. tomorrow) to process today's entries — used by test routes.
+export async function runDigestAt(asOfDate: string): Promise<void> {
   const queue = readEmailQueue();
   const students = readStudents();
   const classes = readClasses();
@@ -17,7 +23,7 @@ export async function runDigest(): Promise<void> {
   const remaining: typeof queue = [];
 
   for (const entry of queue) {
-    if (entry.date >= today) {
+    if (entry.date >= asOfDate) {
       remaining.push(entry);
       continue;
     }

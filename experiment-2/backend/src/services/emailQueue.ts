@@ -1,8 +1,16 @@
 import type { Grade } from "../types";
 import { readEmailQueue, writeEmailQueue } from "./storage";
 
+function localDateString(): string {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 export function enqueue(studentId: string, classId: string, goalId: string, grade: Grade): void {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateString();
   const queue = readEmailQueue();
 
   const index = queue.findIndex((e) => e.studentId === studentId && e.date === today);
