@@ -6,6 +6,7 @@ import { Sidebar } from "./components/Sidebar";
 import { ToastProvider } from "./components/Toast";
 import { ClassDetailPage } from "./pages/ClassDetailPage";
 import { ClassesPage } from "./pages/ClassesPage";
+import { GoalsPage } from "./pages/GoalsPage";
 import { StudentsPage } from "./pages/StudentsPage";
 import "./styles/main.css";
 
@@ -29,6 +30,7 @@ function App() {
             <Route path="/alunos" element={<StudentsPage />} />
             <Route path="/turmas" element={<ClassesPage />} />
             <Route path="/turmas/:id" element={<ClassDetailPage />} />
+            <Route path="/metas" element={<GoalsPage />} />
           </Routes>
         </div>
       </main>
