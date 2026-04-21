@@ -4,6 +4,8 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { BottomNav } from "./components/BottomNav";
 import { Sidebar } from "./components/Sidebar";
 import { ToastProvider } from "./components/Toast";
+import { ClassDetailPage } from "./pages/ClassDetailPage";
+import { ClassesPage } from "./pages/ClassesPage";
 import { StudentsPage } from "./pages/StudentsPage";
 import "./styles/main.css";
 
@@ -25,6 +27,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/alunos" replace />} />
             <Route path="/alunos" element={<StudentsPage />} />
+            <Route path="/turmas" element={<ClassesPage />} />
+            <Route path="/turmas/:id" element={<ClassDetailPage />} />
           </Routes>
         </div>
       </main>
