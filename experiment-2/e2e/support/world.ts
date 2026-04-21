@@ -127,6 +127,24 @@ export class World extends CucumberWorld {
   async createGoal(name: string): Promise<GoalRecord> {
     return this.apiPost<GoalRecord>("/api/goals", { name });
   }
+
+  async getGoalByName(name: string): Promise<GoalRecord | undefined> {
+    const goals = await this.apiGet<GoalRecord[]>("/api/goals");
+    return goals.find((g) => g.name === name);
+  }
+
+  async upsertEvaluation(
+    classId: string,
+    studentId: string,
+    goalId: string,
+    grade: string,
+  ): Promise<void> {
+    await fetch(`${BACKEND_URL}/api/classes/${classId}/evaluations`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentId, goalId, grade }),
+    });
+  }
 }
 
 setWorldConstructor(World);
