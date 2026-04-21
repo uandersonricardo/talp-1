@@ -9,3 +9,4 @@ Este repositório contém os experimentos propostos ao longo da disciplina.
 | Pasta | Descrição |
 |-------|-----------|
 | [`experiment-1/`](experiment-1/) | Sistema web de criação e correção de provas |
+| [`experiment-2/`](experiment-2/) | Sistema web de gerenciamento de estudantes e avaliações |
