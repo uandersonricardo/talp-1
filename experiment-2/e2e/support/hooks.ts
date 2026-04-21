@@ -18,17 +18,20 @@ AfterAll(async function () {
 });
 
 // Each scenario gets a fresh browser context with a 1280×720 desktop viewport
-// (≥ lg breakpoint) so the sidebar is visible. Student data is wiped via the
-// API before every scenario so each test starts from a known empty state.
+// (≥ lg breakpoint) so the sidebar is visible. All persisted data is wiped via
+// the API before every scenario so each test starts from a known empty state.
 Before(async function (this: World) {
   this.context = await browser.newContext({
     baseURL: FRONTEND_URL,
     viewport: { width: 1280, height: 720 },
   });
   this.page = await this.context.newPage();
+  this.resetDigestOffset();
   await this.cleanStudents();
   await this.cleanClasses();
   await this.cleanGoals();
+  await this.cleanEmailQueue();
+  await this.clearSentEmails();
 });
 
 After(async function (this: World) {
