@@ -10,11 +10,17 @@ const PAGE_PATHS: Record<string, string> = {
   Metas: "/metas",
 };
 
-// Maps Portuguese field labels from the feature file to data-testid values
+// Maps Portuguese field labels from the feature file to data-testid values.
+// Shared between students and classes features — add new fields here as needed.
 const FIELD_TEST_IDS: Record<string, string> = {
+  // Student fields
   Nome: "student-name-input",
   CPF: "student-cpf-input",
   "E-mail": "student-email-input",
+  // Class fields
+  "Descrição": "class-description-input",
+  "Ano": "class-year-input",
+  "Semestre": "class-semester-select",
 };
 
 // Default CPF used when scenarios only specify a name (all 11 digits, not all same)
@@ -83,16 +89,17 @@ Given("a student {string} is registered", async function (this: World, name: str
 // ─── User actions (When) ──────────────────────────────────────────────────────
 
 When("I click {string}", async function (this: World, label: string) {
+  // Fast-path for a handful of buttons that share labels with other contexts and
+  // could be ambiguous to a role-based selector. Everything else falls through to
+  // a role-based lookup which works for any visible button.
   const testIdMap: Record<string, string> = {
     "Novo Aluno": "btn-new-student",
-    Salvar: "btn-save-student",
-    Cancelar: "btn-cancel-modal",
   };
   const testId = testIdMap[label];
   if (testId) {
     await this.page.getByTestId(testId).click();
   } else {
-    await this.page.getByRole("button", { name: label, exact: true }).click();
+    await this.page.getByRole("button", { name: label, exact: true }).first().click();
   }
 });
 
@@ -118,16 +125,16 @@ When(
 When(
   "I click the edit button for {string}",
   async function (this: World, name: string) {
-    const row = this.page.getByTestId("student-row").filter({ hasText: name });
-    await row.getByTestId("btn-edit-student").click();
+    // Both student and class edit buttons carry an aria-label of "Editar <name>"
+    await this.page.getByRole("button", { name: `Editar ${name}`, exact: true }).click();
   },
 );
 
 When(
   "I click the delete button for {string}",
   async function (this: World, name: string) {
-    const row = this.page.getByTestId("student-row").filter({ hasText: name });
-    await row.getByTestId("btn-delete-student").click();
+    // Both student and class delete buttons carry an aria-label of "Excluir <name>"
+    await this.page.getByRole("button", { name: `Excluir ${name}`, exact: true }).click();
   },
 );
 
@@ -142,7 +149,8 @@ When("I cancel the deletion", async function (this: World) {
 // ─── Assertions (Then) ────────────────────────────────────────────────────────
 
 Then("I should see an empty state message", async function (this: World) {
-  await expect(this.page.getByTestId("students-empty-state")).toBeVisible();
+  // Any page-level empty state uses a data-testid ending in "-empty-state"
+  await expect(this.page.locator("[data-testid$='-empty-state']").first()).toBeVisible();
 });
 
 Then("I should see a {string} button", async function (this: World, label: string) {
@@ -159,7 +167,8 @@ Then(
 Then(
   "the list should include {string}",
   async function (this: World, name: string) {
-    await expect(this.page.getByTestId("students-table").getByText(name)).toBeVisible();
+    // Works for any visible data table on the page (students or classes)
+    await expect(this.page.locator("table").getByText(name)).toBeVisible();
   },
 );
 
@@ -179,22 +188,25 @@ Then("I should see a success notification", async function (this: World) {
 Then(
   "I should see a validation error for {string}",
   async function (this: World, fieldLabel: string) {
-    // Validation error <p> elements are rendered below each input inside the form
+    // Validation error <p> elements are rendered below each input inside the open dialog
     const patterns: Record<string, RegExp> = {
       Nome: /nome é obrigatório/i,
       CPF: /cpf/i,
       "E-mail": /e-mail/i,
+      "Descrição": /descrição é obrigatória/i,
+      "Ano": /ano inválido/i,
+      "Semestre": /semestre é obrigatório/i,
     };
     const pattern = patterns[fieldLabel];
     if (!pattern) throw new Error(`No error pattern for field: "${fieldLabel}"`);
     await expect(
-      this.page.getByTestId("student-form").locator("p").filter({ hasText: pattern }),
+      this.page.locator('[role="dialog"]').locator("p").filter({ hasText: pattern }),
     ).toBeVisible();
   },
 );
 
 Then("the modal should remain open", async function (this: World) {
-  await expect(this.page.getByTestId("student-modal")).toBeVisible();
+  await expect(this.page.locator('[role="dialog"]')).toBeVisible();
 });
 
 Then(
@@ -207,7 +219,7 @@ Then(
 );
 
 Then("the modal should be closed", async function (this: World) {
-  await expect(this.page.getByTestId("student-modal")).not.toBeVisible();
+  await expect(this.page.locator('[role="dialog"]')).not.toBeVisible();
 });
 
 Then("no new student should appear in the list", async function (this: World) {

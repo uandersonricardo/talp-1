@@ -224,6 +224,16 @@ export function ClassDetailPage() {
         onClose={() => setAddStudentModalOpen(false)}
         testId="add-student-modal"
         maxWidth="sm"
+        footer={
+          <button
+            type="button"
+            data-testid="btn-confirm-enrollment"
+            onClick={() => setAddStudentModalOpen(false)}
+            className="px-4 py-2 text-sm font-medium text-white rounded-lg bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] transition-colors duration-100 focus:outline-2 focus:outline-offset-2 focus:outline-[var(--color-primary)]"
+          >
+            Confirmar
+          </button>
+        }
       >
         {unenrolledStudents.length === 0 ? (
           <p className="text-sm text-[var(--color-text-secondary)] py-2">
