@@ -11,7 +11,7 @@ import type { Class } from "../types";
 interface ClassForm {
   description: string;
   year: string;
-  semester: "1" | "2";
+  semester: "1" | "2" | "";
 }
 
 type FormErrors = Partial<Record<keyof ClassForm, string>>;
@@ -19,7 +19,7 @@ type FormErrors = Partial<Record<keyof ClassForm, string>>;
 const EMPTY_FORM: ClassForm = {
   description: "",
   year: String(new Date().getFullYear()),
-  semester: "1",
+  semester: "",
 };
 
 function validateForm(form: ClassForm): FormErrors {
@@ -27,6 +27,7 @@ function validateForm(form: ClassForm): FormErrors {
   if (!form.description.trim()) errors.description = "Descrição é obrigatória";
   const y = Number(form.year);
   if (!form.year || !Number.isInteger(y) || y < 2000 || y > 2100) errors.year = "Ano inválido (ex: 2026)";
+  if (!form.semester) errors.semester = "Semestre é obrigatório";
   return errors;
 }
 
@@ -281,9 +282,9 @@ function Field({ id, testId, label, type, value, placeholder, error, inputMode, 
 // ─── SemesterSelect ───────────────────────────────────────────────────────────
 
 interface SemesterSelectProps {
-  value: "1" | "2";
+  value: "1" | "2" | "";
   error?: string;
-  onChange: (v: "1" | "2") => void;
+  onChange: (v: "1" | "2" | "") => void;
 }
 
 function SemesterSelect({ value, error, onChange }: SemesterSelectProps) {
@@ -299,13 +300,14 @@ function SemesterSelect({ value, error, onChange }: SemesterSelectProps) {
         id="class-semester"
         data-testid="class-semester-select"
         value={value}
-        onChange={(e) => onChange(e.target.value as "1" | "2")}
+        onChange={(e) => onChange(e.target.value as "1" | "2" | "")}
         className={`w-full px-3 py-2 text-sm rounded-lg border bg-[var(--color-surface)] transition-colors focus:outline-none focus:border-[var(--color-primary)] focus:shadow-[0_0_0_3px_rgba(26,110,245,0.15)] ${
           error
             ? "border-[var(--color-destructive)]"
             : "border-[var(--color-border)] hover:border-[var(--color-border-strong)]"
         }`}
       >
+        <option value="">Selecione o semestre</option>
         <option value="1">1º Semestre</option>
         <option value="2">2º Semestre</option>
       </select>

@@ -27,6 +27,8 @@ Before(async function (this: World) {
   });
   this.page = await this.context.newPage();
   await this.cleanStudents();
+  await this.cleanClasses();
+  await this.cleanGoals();
 });
 
 After(async function (this: World) {
